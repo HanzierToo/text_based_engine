@@ -1,0 +1,29 @@
+scene:
+  id: intro
+  nodes:
+    - id: start
+      text:
+        - "You are standing in a small, empty room."
+        - if:
+            var: has_key
+            eq: true
+          then: "You are holding a small brass key."
+      choices:
+        - id: take_key
+          text: "Pick up the key"
+          if:
+            var: has_key
+            eq: false
+          effects:
+            - set:
+                var: has_key
+                value: true
+          goto:
+            scene: intro
+            node: start
+
+        - id: wait
+          text: "Wait for a moment"
+          goto:
+            scene: intro
+            node: start
