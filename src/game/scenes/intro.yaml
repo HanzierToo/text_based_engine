@@ -4,13 +4,12 @@ scene:
     - id: start
       text:
         - key: intro.room
-        - "Key status: {{has_key}}"
         - if:
             eq:
               var: has_key
               value: true
           then:
-            key: intro.has_key
+            key: intro.has_key 
 
       choices:
         - id: take_key
@@ -23,6 +22,8 @@ scene:
             - set:
                 var: has_key
                 value: true
+            - add_item:
+                id: intro_key
           goto:
             scene: intro
             node: start

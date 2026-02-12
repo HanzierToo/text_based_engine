@@ -27,6 +27,7 @@ export interface SaveDataV0 {
     seed: number
     counter: number
   }
+  inventory?: string[]
 }
 
 export class GameSession {
@@ -34,6 +35,7 @@ export class GameSession {
   private _state: NormalizedState
   private _history: TransitionRecord[] = []
   private _rng?: { seed: number; counter: number }
+  private _inventory: Set<string> = new Set()
 
   constructor(model: NormalizedGameModel) {
     const start = model.manifest.start
@@ -51,6 +53,10 @@ export class GameSession {
 
   get rng(): { seed: number; counter: number } | undefined {
     return this._rng
+  }
+
+  get inventory(): ReadonlySet<string> {
+    return this._inventory
   }
 
   /** Returns a value for a declared variable. Throws if not found. */
@@ -105,6 +111,7 @@ export class GameSession {
       state,
       history: [...this._history],
       rng: this._rng ? { ...this._rng } : undefined,
+      inventory: [...this._inventory],
     }
   }
 
@@ -127,12 +134,28 @@ export class GameSession {
     if (save.rng) {
       this._rng = { ...save.rng }
     }
+
+    if (save.inventory) {
+      this._inventory = new Set(save.inventory)
+    }
   }
 
   initializeRng(seed: number): void {
     if (!this._rng) {
         this._rng = { seed, counter: 0 }
     }
+  }
+
+  addItem(id: string): void {
+    this._inventory.add(id)
+  }
+
+  removeItem(id: string): void {
+    this._inventory.delete(id)
+  }
+
+  hasItem(id: string): boolean {
+    return this._inventory.has(id)
   }
 }
 

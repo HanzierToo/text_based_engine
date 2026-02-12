@@ -200,4 +200,19 @@ export interface ParsedGameData {
   state: StateDefinition
   scenes: Record<string, SceneDefinition>
   localization: LocalizationBundle
+  items: ItemsFile
+}
+
+/* ============================================================
+ * Inventory System
+ * ============================================================
+ */
+
+export interface ItemDefinition {
+  name: string
+  description?: string
+}
+
+export interface ItemsFile {
+  items: Record<string, ItemDefinition>
 }

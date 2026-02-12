@@ -10,6 +10,7 @@ import { PluginRegistry } from '../plugins/registry'
 import type { Condition } from '../schema/types'
 import { CorePlugin } from '../plugins/builtins/core'
 import { RandomnessPlugin } from '../plugins/builtins/randomness'
+import { InventoryPlugin } from '../plugins/builtins/inventory'
 
 export type ViewChoice = {
   id: string
@@ -24,6 +25,11 @@ export type ViewModel = {
   text: string[]
   choices: ViewChoice[]
   visibleState: Record<string, boolean | number | string>
+  inventory: Array<{
+    id: string
+    name: string
+    description?: string
+  }>
 }
 
 export class Engine {
@@ -41,6 +47,10 @@ export class Engine {
 
     if (systems.randomness) {
         this.plugins.register(RandomnessPlugin)
+    }
+
+    if (this.model.rules.systems.inventory) {
+        this.plugins.register(InventoryPlugin)
     }
 
     this.plugins.finalize()
@@ -69,6 +79,20 @@ export class Engine {
           enabled: true,
         })),
       visibleState: this.session.getVisibleState(),
+      inventory: Array.from(this.session.inventory).map(id => {
+        const def = this.model.items.get(id)
+        if (!def) {
+          throw new EngineError(
+            'E_REF_NOT_FOUND',
+            `Inventory contains unknown item "${id}"`
+          )
+        }
+        return {
+          id,
+          name: def.name,
+          description: def.description,
+        }
+      }),
     }
   }
 
@@ -157,5 +181,16 @@ export class Engine {
 
   getAllScenes() {
     return this.model.scenes
+  }
+
+  getInventory() {
+    return Array.from(this.session.inventory).map(id => {
+        const def = this.model.items.get(id)!
+        return {
+        id,
+        name: def.name,
+        description: def.description,
+        }
+    })
   }
 }

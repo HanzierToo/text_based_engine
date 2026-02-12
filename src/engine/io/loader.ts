@@ -7,6 +7,7 @@ export type LoadedGameFiles = {
   game: ParsedFile
   rules: ParsedFile
   state: ParsedFile
+  items: ParsedFile
   scenes: Record<string, ParsedFile>
   localization: Record<string, ParsedFile>
 }
@@ -33,6 +34,7 @@ export function loadGameFiles(): LoadedGameFiles {
     game: parseYaml(raw.game, 'game.yaml'),
     rules: parseYaml(raw.rules, 'rules.yaml'),
     state: parseYaml(raw.state, 'state.yaml'),
+    items: parseYaml(raw.items, 'items.yaml'),
     scenes,
     localization,
   }

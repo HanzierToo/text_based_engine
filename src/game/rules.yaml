@@ -1,6 +1,6 @@
 rules:
   systems:
-    inventory: false
+    inventory: true
     statistics: false
     combat: false
     randomness: true

@@ -4,6 +4,7 @@ export type RawGameAssets = {
   game: string
   rules: string
   state: string
+  items: string
   scenes: Record<string, string>
   localization: Record<string, string>
 }
@@ -18,6 +19,7 @@ export function collectRawGameAssets(): RawGameAssets {
   let game: string | null = null
   let rules: string | null = null
   let state: string | null = null
+  let items: string | null = null
 
   const scenes: Record<string, string> = {}
   const localization: Record<string, string> = {}
@@ -29,6 +31,8 @@ export function collectRawGameAssets(): RawGameAssets {
       rules = content
     } else if (path.endsWith('/state.yaml')) {
       state = content
+    } else if (path.endsWith('/items.yaml')) {
+      items = content
     } else if (path.includes('/scenes/')) {
       const name = path.split('/scenes/')[1]
       scenes[name] = content
@@ -41,11 +45,13 @@ export function collectRawGameAssets(): RawGameAssets {
   if (!game) throw new Error('Missing required file: game.yaml')
   if (!rules) throw new Error('Missing required file: rules.yaml')
   if (!state) throw new Error('Missing required file: state.yaml')
+  if (!items) throw new Error('Missing required file: items.yaml')
 
   return {
     game,
     rules,
     state,
+    items,
     scenes,
     localization,
   }

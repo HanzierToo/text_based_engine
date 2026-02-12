@@ -4,6 +4,7 @@ import type {
   ParsedGameData,
   SceneDefinition,
   NodeDefinition,
+  ItemDefinition,
   StateVariableDefinition,
 } from './types'
 
@@ -16,6 +17,7 @@ export interface NormalizedGameModel {
   manifest: ParsedGameData['manifest']['game']
   rules: ParsedGameData['rules']['rules']
   state: NormalizedState
+  items: Map<string, ItemDefinition>
   scenes: Map<string, NormalizedScene>
   localization: ParsedGameData['localization']
 }
@@ -53,6 +55,7 @@ export function normalizeGameData(
     manifest: data.manifest.game,
     rules: data.rules.rules,
     state: normalizeState(data),
+    items: normalizeItems(data),
     scenes: normalizeScenes(data),
     localization: data.localization,
   }
@@ -81,6 +84,23 @@ function normalizeState(data: ParsedGameData): NormalizedState {
   }
 
   return { variables }
+}
+
+/* ============================================================
+ * Inventory
+ * ============================================================
+ */
+
+function normalizeItems(
+  data: ParsedGameData
+): Map<string, ItemDefinition> {
+  const items = new Map<string, ItemDefinition>()
+
+  for (const [id, def] of Object.entries(data.items.items)) {
+    items.set(id, def)
+  }
+
+  return items
 }
 
 /* ============================================================

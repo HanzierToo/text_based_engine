@@ -13,6 +13,7 @@ export function validateGameData(data: ParsedGameData): void {
   validateManifest(data)
   validateRules(data)
   validateState(data)
+  validateItems(data)
   validateScenes(data)
   validateStartNode(data)
 }
@@ -84,12 +85,14 @@ function validateCondition(condition: Condition, path: string): void {
 
 function validateEffects(
   effects: Effect[] | undefined,
-  path: string
+  path: string,
+  data: ParsedGameData
 ): void {
   if (!effects) return
 
   effects.forEach((effect, i) => {
     const keys = Object.keys(effect)
+
     if (keys.length !== 1) {
       throw new EngineError(
         'E_EFFECT_INVALID',
@@ -97,8 +100,12 @@ function validateEffects(
       )
     }
 
-    if ('set' in effect) {
-      if (!effect.set.var) {
+    const operator = keys[0]
+    const payload = (effect as any)[operator]
+
+    // Core effects
+    if (operator === 'set') {
+      if (!payload.var) {
         throw new EngineError(
           'E_EFFECT_INVALID',
           `Set effect missing var at ${path}[${i}]`
@@ -106,8 +113,8 @@ function validateEffects(
       }
     }
 
-    if ('add' in effect) {
-      if (!effect.add.var) {
+    if (operator === 'add') {
+      if (!payload.var) {
         throw new EngineError(
           'E_EFFECT_INVALID',
           `Add effect missing var at ${path}[${i}]`
@@ -115,15 +122,33 @@ function validateEffects(
       }
 
       if (
-        typeof effect.add.value === 'object' &&
-        'random' in effect.add.value
+        typeof payload.value === 'object' &&
+        'random' in payload.value
       ) {
-        if (!/^\d+\/\d+$/.test(effect.add.value.random)) {
+        if (!/^\d+\/\d+$/.test(payload.value.random)) {
           throw new EngineError(
             'E_EFFECT_INVALID',
             `Invalid random format at ${path}[${i}]`
           )
         }
+      }
+    }
+
+    // Inventory effects
+    if (operator === 'add_item' || operator === 'remove_item') {
+      if (!payload || typeof payload.id !== 'string') {
+        throw new EngineError(
+          'E_EFFECT_INVALID',
+          `${operator} requires { id: string } at ${path}[${i}]`
+        )
+      }
+
+      if (!data.items.items[payload.id]) {
+        throw new EngineError(
+          'E_REF_NOT_FOUND',
+          `Unknown item "${payload.id}" at ${path}[${i}]`,
+          { file: 'items.yaml', path: `items.${payload.id}` }
+        )
       }
     }
   })
@@ -191,6 +216,26 @@ function validateState(data: ParsedGameData): void {
 }
 
 /* ============================================================
+ * Inventory
+ * ============================================================
+ */
+
+function validateItems(data: ParsedGameData): void {
+  const items = data.items.items
+
+  for (const [id, def] of Object.entries(items)) {
+    if (!def.name) {
+      throw new EngineError(
+        'E_SCHEMA_MISSING_FIELD',
+        `Item "${id}" missing name`,
+        { file: 'items.yaml', path: `items.${id}.name` }
+      )
+    }
+  }
+}
+
+
+/* ============================================================
  * Scenes and Nodes
  * ============================================================
  */
@@ -210,11 +255,11 @@ function validateScenes(data: ParsedGameData): void {
     }
     sceneIds.add(scene.id)
 
-    validateNodes(sceneDef, filename)
+    validateNodes(sceneDef, filename, data)
   }
 }
 
-function validateNodes(sceneDef: SceneDefinition, filename: string): void {
+function validateNodes(sceneDef: SceneDefinition, filename: string, data: ParsedGameData): void {
   const nodeIds = new Set<string>()
 
   for (const node of sceneDef.scene.nodes) {
@@ -236,14 +281,15 @@ function validateNodes(sceneDef: SceneDefinition, filename: string): void {
       }
     })
 
-    validateChoices(node, sceneDef.scene.id, filename)
+    validateChoices(node, sceneDef.scene.id, filename, data)
   }
 }
 
 function validateChoices(
   node: NodeDefinition,
   sceneId: string,
-  filename: string
+  filename: string,
+  data: ParsedGameData,
 ): void {
   for (const choice of node.choices) {
     if (!choice.goto) {
@@ -259,10 +305,11 @@ function validateChoices(
         `scene.${sceneId}.node.${node.id}.choice.${choice.id}.if`
       )
     }
-    validateEffects(
-      choice.effects,
-      `scene.${sceneId}.node.${node.id}.choice.${choice.id}.effects`
-    )
+      validateEffects(
+        choice.effects,
+        `scene.${sceneId}.node.${node.id}.choice.${choice.id}.effects`,
+        data
+      )
   }
 }
 

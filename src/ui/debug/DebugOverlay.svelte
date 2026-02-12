@@ -40,6 +40,11 @@
     </section>
 
     <section>
+      <strong>Inventory:</strong>
+      <pre>{JSON.stringify($engineStore.engine.getInventory(), null, 2)}</pre>
+    </section>
+
+    <section>
       <strong>History:</strong>
       <pre>
 {JSON.stringify($engineStore.engine.getHistory(), null, 2)}

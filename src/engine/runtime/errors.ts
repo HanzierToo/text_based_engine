@@ -20,6 +20,7 @@ export type EngineErrorCode =
   | 'E_PLUGIN_ORDER_UNKNOWN'
   | 'E_PLUGIN_ORDER_UNKNOWN'
   | 'E_PLUGIN_ORDER_CYCLE'
+  | 'E_REF_NOT_FOUND'
 
 export class EngineError extends Error {
   readonly code: EngineErrorCode
