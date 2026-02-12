@@ -3,17 +3,22 @@ scene:
   nodes:
     - id: start
       text:
-        - "You are standing in a small, empty room."
+        - key: intro.room
+        - "Key status: {{has_key}}"
         - if:
-            var: has_key
-            eq: true
-          then: "You are holding a small brass key."
+            eq:
+              var: has_key
+              value: true
+          then:
+            key: intro.has_key
+
       choices:
         - id: take_key
           text: "Pick up the key"
           if:
-            var: has_key
-            eq: false
+            eq:
+              var: has_key
+              value: false
           effects:
             - set:
                 var: has_key

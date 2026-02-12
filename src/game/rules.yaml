@@ -3,7 +3,7 @@ rules:
     inventory: false
     statistics: false
     combat: false
-    randomness: false
+    randomness: true
 
   state_visibility:
     default: visible

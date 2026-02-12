@@ -5,7 +5,11 @@ import { EngineError } from './errors'
 import { GameSession, type NodeRef, type SaveDataV0 } from './session'
 import { evaluateCondition } from './evaluator'
 import { applyEffects } from './effects'
+import { resolveText } from './resolver'
+import { PluginRegistry } from '../plugins/registry'
 import type { Condition } from '../schema/types'
+import { CorePlugin } from '../plugins/builtins/core'
+import { RandomnessPlugin } from '../plugins/builtins/randomness'
 
 export type ViewChoice = {
   id: string
@@ -25,14 +29,26 @@ export type ViewModel = {
 export class Engine {
   private readonly model: NormalizedGameModel
   private readonly session: GameSession
+  private readonly plugins = new PluginRegistry()
 
   constructor(model: NormalizedGameModel) {
     this.model = model
     this.session = new GameSession(model)
     this.assertNodeExists(this.session.at)
+    this.plugins.register(CorePlugin)
+
+    const systems = this.model.rules.systems
+
+    if (systems.randomness) {
+        this.plugins.register(RandomnessPlugin)
+    }
+
+    this.plugins.finalize()
   }
 
   start(): ViewModel {
+    this.plugins.runHook('onStart', this.session, this.model)
+    this.assertNodeExists(this.session.at)
     return this.getViewModel()
   }
 
@@ -44,9 +60,9 @@ export class Engine {
       gameTitle: this.model.manifest.title,
       sceneId: at.scene,
       nodeId: at.node,
-      text: resolveTextV0(node.text, this.session),
+      text: resolveText(node.text, this.session, this.model, this.plugins),
       choices: node.choices
-        .filter(c => !c.if || evaluateCondition(c.if, this.session))
+        .filter(c => !c.if || evaluateCondition(c.if, this.session, this.model, this.plugins))
         .map(c => ({
           id: c.id,
           text: c.text,
@@ -68,7 +84,9 @@ export class Engine {
       )
     }
 
-    if (choice.if && !evaluateCondition(choice.if, this.session)) {
+    this.plugins.runHook('beforeChoice', this.session, this.model)
+
+    if (choice.if && !evaluateCondition(choice.if, this.session, this.model, this.plugins)) {
       throw new EngineError(
         'E_RUNTIME_ILLEGAL_CHOICE',
         `Choice "${choiceId}" is not currently available`
@@ -82,8 +100,11 @@ export class Engine {
 
     this.assertNodeExists(to)
 
-    applyEffects(choice.effects, this.session, this.model)
+    this.plugins.runHook('beforeTransition', this.session, this.model)
+    applyEffects(choice.effects, this.session, this.model, this.plugins)
     this.session.move(to, choiceId, from)
+    this.plugins.runHook('afterTransition', this.session, this.model)
+    this.plugins.runHook('afterChoice', this.session, this.model)
     return this.getViewModel()
   }
 
@@ -120,26 +141,21 @@ export class Engine {
   private assertNodeExists(ref: NodeRef): void {
     this.getNode(ref)
   }
-}
 
-/* ============================================================
- * Text resolution (v0)
- * ============================================================
- */
-
-function resolveTextV0(
-  text: Array<string | { if: Condition; then: string }>,
-  session: GameSession
-): string[] {
-  const out: string[] = []
-
-  for (const frag of text) {
-    if (typeof frag === 'string') {
-      out.push(frag)
-    } else if (evaluateCondition(frag.if, session)) {
-      out.push(frag.then)
-    }
+  getCurrentNodeRef(): NodeRef {
+    return this.session.at
   }
 
-  return out
+  getFullState(): Record<string, boolean | number | string> {
+    const save = this.session.save()
+    return save.state
+  }
+
+  getHistory() {
+    return this.session.history
+  }
+
+  getAllScenes() {
+    return this.model.scenes
+  }
 }

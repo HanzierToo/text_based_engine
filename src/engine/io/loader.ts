@@ -20,10 +20,15 @@ export function loadGameFiles(): LoadedGameFiles {
   }
 
   const localization: Record<string, ParsedFile> = {}
-  for (const [name, content] of Object.entries(raw.localization)) {
-    localization[name] = parseYaml(content, `localization/${name}`)
-  }
 
+  for (const [name, content] of Object.entries(raw.localization)) {
+    const namespace = name.replace(/\.ya?ml$/, '')
+    localization[namespace] = parseYaml(
+      content,
+      `localization/${name}`
+    )
+  }
+  
   return {
     game: parseYaml(raw.game, 'game.yaml'),
     rules: parseYaml(raw.rules, 'rules.yaml'),

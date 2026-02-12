@@ -39,13 +39,6 @@ export class GameSession {
     const start = model.manifest.start
     this._at = { scene: start.scene, node: start.node }
     this._state = cloneState(model.state)
-
-    if (model.rules.systems.randomness) {
-      this._rng = {
-        seed: Date.now(),
-        counter: 0,
-      }
-    }
   }
 
   get at(): NodeRef {
@@ -133,6 +126,12 @@ export class GameSession {
 
     if (save.rng) {
       this._rng = { ...save.rng }
+    }
+  }
+
+  initializeRng(seed: number): void {
+    if (!this._rng) {
+        this._rng = { seed, counter: 0 }
     }
   }
 }

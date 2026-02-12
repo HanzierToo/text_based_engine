@@ -97,11 +97,16 @@ export interface NodeDefinition {
 
 export type TextFragment =
   | string
+  | LocalizationKey
   | ConditionalTextFragment
+
+export interface LocalizationKey {
+  key: string
+}
 
 export interface ConditionalTextFragment {
   if: Condition
-  then: string
+  then: string | LocalizationKey
 }
 
 /* ============================================================

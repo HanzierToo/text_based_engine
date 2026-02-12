@@ -14,6 +14,12 @@ export type EngineErrorCode =
   | 'E_EFFECT_INVALID'
   | 'E_LOCALIZATION_KEY_MISSING'
   | 'E_RUNTIME_ILLEGAL_CHOICE'
+  | 'E_PLUGIN_REGISTRY_LOCKED'
+  | 'E_PLUGIN_DUPLICATE_ID'
+  | 'E_PLUGIN_DEPENDENCY_MISSING'
+  | 'E_PLUGIN_ORDER_UNKNOWN'
+  | 'E_PLUGIN_ORDER_UNKNOWN'
+  | 'E_PLUGIN_ORDER_CYCLE'
 
 export class EngineError extends Error {
   readonly code: EngineErrorCode

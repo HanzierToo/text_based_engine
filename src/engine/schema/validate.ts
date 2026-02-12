@@ -4,6 +4,8 @@ import {
   ParsedGameData,
   SceneDefinition,
   NodeDefinition,
+  Condition,
+  Effect,
 } from './types'
 import { EngineError } from '../runtime/errors'
 
@@ -13,6 +15,118 @@ export function validateGameData(data: ParsedGameData): void {
   validateState(data)
   validateScenes(data)
   validateStartNode(data)
+}
+
+/* ============================================================
+ * Condition Validation (Operator-Based)
+ * ============================================================
+ */
+
+function validateCondition(condition: Condition, path: string): void {
+  const keys = Object.keys(condition)
+
+  if (keys.length !== 1) {
+    throw new EngineError(
+      'E_CONDITION_INVALID',
+      `Condition must contain exactly one operator at ${path}`
+    )
+  }
+
+  const operator = keys[0]
+
+  // Logical operators
+  if (operator === 'all' || operator === 'any') {
+    const arr = (condition as any)[operator]
+
+    if (!Array.isArray(arr) || arr.length === 0) {
+      throw new EngineError(
+        'E_CONDITION_INVALID',
+        `"${operator}" must be a non-empty array at ${path}`
+      )
+    }
+
+    arr.forEach((c: Condition, i: number) =>
+      validateCondition(c, `${path}.${operator}[${i}]`)
+    )
+
+    return
+  }
+
+  if (operator === 'not') {
+    const inner = (condition as any).not
+
+    if (!inner) {
+      throw new EngineError(
+        'E_CONDITION_INVALID',
+        `"not" condition missing value at ${path}`
+      )
+    }
+
+    validateCondition(inner, `${path}.not`)
+    return
+  }
+
+  // Primitive/operator-based condition
+  const payload = (condition as any)[operator]
+
+  if (
+    typeof payload !== 'object' ||
+    payload === null ||
+    !payload.var ||
+    !('value' in payload)
+  ) {
+    throw new EngineError(
+      'E_CONDITION_INVALID',
+      `Invalid payload for operator "${operator}" at ${path}`
+    )
+  }
+}
+
+function validateEffects(
+  effects: Effect[] | undefined,
+  path: string
+): void {
+  if (!effects) return
+
+  effects.forEach((effect, i) => {
+    const keys = Object.keys(effect)
+    if (keys.length !== 1) {
+      throw new EngineError(
+        'E_EFFECT_INVALID',
+        `Effect must contain exactly one operator at ${path}[${i}]`
+      )
+    }
+
+    if ('set' in effect) {
+      if (!effect.set.var) {
+        throw new EngineError(
+          'E_EFFECT_INVALID',
+          `Set effect missing var at ${path}[${i}]`
+        )
+      }
+    }
+
+    if ('add' in effect) {
+      if (!effect.add.var) {
+        throw new EngineError(
+          'E_EFFECT_INVALID',
+          `Add effect missing var at ${path}[${i}]`
+        )
+      }
+
+      if (
+        typeof effect.add.value === 'object' &&
+        'random' in effect.add.value
+      ) {
+        if (!/^\d+\/\d+$/.test(effect.add.value.random)) {
+          throw new EngineError(
+            'E_EFFECT_INVALID',
+            `Invalid random format at ${path}[${i}]`
+          )
+        }
+      }
+    }
+  })
 }
 
 /* ============================================================
@@ -113,6 +227,15 @@ function validateNodes(sceneDef: SceneDefinition, filename: string): void {
     }
     nodeIds.add(node.id)
 
+    node.text.forEach((frag, index) => {
+      if (typeof frag !== 'string' && 'if' in frag) {
+        validateCondition(
+          frag.if,
+          `scene.${sceneDef.scene.id}.node.${node.id}.text[${index}].if`
+        )
+      }
+    })
+
     validateChoices(node, sceneDef.scene.id, filename)
   }
 }
@@ -130,6 +253,16 @@ function validateChoices(
         { file: `scenes/${filename}`, path: `node.${node.id}.choices.${choice.id}` }
       )
     }
+    if (choice.if) {
+      validateCondition(
+        choice.if,
+        `scene.${sceneId}.node.${node.id}.choice.${choice.id}.if`
+      )
+    }
+    validateEffects(
+      choice.effects,
+      `scene.${sceneId}.node.${node.id}.choice.${choice.id}.effects`
+    )
   }
 }
 
@@ -161,4 +294,5 @@ function validateStartNode(data: ParsedGameData): void {
       { file: 'game.yaml', path: 'game.start.node' }
     )
   }
+
 }

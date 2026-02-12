@@ -3,6 +3,8 @@
   import { validateGameData } from '../engine/schema/validate'
   import { normalizeGameData } from '../engine/schema/normalize'
   import { Engine } from '../engine/runtime/engine'
+  import { engineStore } from './engineStore'
+  import { get } from 'svelte/store'
   import type {
     GameManifest,
     RulesConfig,
@@ -12,10 +14,11 @@
     ParsedGameData
   } from '../engine/schema/types'
 
-  let status = 'loading...'
-  let engine: Engine | null = null
-  let vm: import('../engine/runtime/engine').ViewModel | null = null
+  import DebugOverlay from '../ui/debug/DebugOverlay.svelte'
+
   let error: string | null = null
+  const DEV = true
+  let debugVisible = true
 
   try {
     const files = loadGameFiles()
@@ -41,36 +44,61 @@
     validateGameData(data)
     const model = normalizeGameData(data)
 
-    engine = new Engine(model)
-    vm = engine.start()
+    const engineInstance = new Engine(model)
+    const vm = engineInstance.start()
 
-    console.log('Normalized model:', model)
-    status = 'Game normalized successfully'
+    engineStore.set({
+      engine: engineInstance,
+      viewModel: vm,
+    })
   } catch (e) {
     error = e instanceof Error ? e.toString() : String(e)
-    status = 'Validation error'
   }
 
   function onChoose(id: string) {
-    if (!engine) return
-    vm = engine.choose(id)
+    const state = get(engineStore)
+    if (!state.engine) return
+
+    const newVm = state.engine.choose(id)
+
+    engineStore.set({
+      engine: state.engine,
+      viewModel: newVm,
+    })
   }
 </script>
+
 {#if error}
   <pre>{error}</pre>
-{:else if vm}
-  <h1>{vm.gameTitle}</h1>
-  <h2>{vm.sceneId}.{vm.nodeId}</h2>
 
-  {#each vm.text as line}
+{:else if $engineStore.viewModel}
+  <h1>{$engineStore.viewModel.gameTitle}</h1>
+
+  {#if DEV}
+    <h2>
+      {$engineStore.viewModel.sceneId}.
+      {$engineStore.viewModel.nodeId}
+    </h2>
+  {/if}
+
+  {#each $engineStore.viewModel.text as line}
     <p>{line}</p>
   {/each}
 
   <div>
-    {#each vm.choices as c}
-      <button on:click={() => onChoose(c.id)} disabled={!c.enabled}>
+    {#each $engineStore.viewModel.choices as c}
+      <button
+        on:click={() => onChoose(c.id)}
+        disabled={!c.enabled}
+      >
         {c.text}
       </button>
     {/each}
   </div>
+
+  <button on:click={() => (debugVisible = !debugVisible)}>
+    Toggle Debug
+  </button>
+
+  <DebugOverlay visible={debugVisible} />
 {/if}

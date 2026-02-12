@@ -1,93 +1,93 @@
 // src/engine/runtime/evaluator.ts
 
-import type { Condition, PrimitiveCondition, LogicalCondition } from '../schema/types'
+import type {
+  Condition,
+  LogicalCondition,
+} from '../schema/types'
 import type { GameSession } from './session'
+import type { NormalizedGameModel } from '../schema/normalize'
 import { EngineError } from './errors'
+import { PluginRegistry } from '../plugins/registry'
 
 export function evaluateCondition(
   condition: Condition,
-  session: GameSession
+  session: GameSession,
+  model: NormalizedGameModel,
+  plugins: PluginRegistry
 ): boolean {
   if (isLogicalCondition(condition)) {
-    return evaluateLogical(condition, session)
+    return evaluateLogical(condition, session, model, plugins)
   }
 
-  if (isPrimitiveCondition(condition)) {
-    return evaluatePrimitive(condition, session)
-  }
-
-  throw new EngineError(
-    'E_CONDITION_INVALID',
-    'Invalid condition structure'
-  )
+  return evaluateOperator(condition, session, model, plugins)
 }
 
 /* ============================================================
- * Primitive Conditions
+ * OPERATOR CONDITIONS
  * ============================================================
  */
 
-function evaluatePrimitive(
-  cond: PrimitiveCondition,
-  session: GameSession
+function evaluateOperator(
+  condition: any,
+  session: GameSession,
+  model: NormalizedGameModel,
+  plugins: PluginRegistry
 ): boolean {
-  const value = session.getVar(cond.var)
+  const keys = Object.keys(condition)
 
-  if ('eq' in cond) return value === cond.eq
-  if ('neq' in cond) return value !== cond.neq
-
-  if (typeof value !== 'number') {
+  if (keys.length !== 1) {
     throw new EngineError(
       'E_CONDITION_INVALID',
-      `Numeric comparison on non-number variable "${cond.var}"`
+      'Operator condition must contain exactly one operator'
     )
   }
 
-  if ('gt' in cond) return value > cond.gt!
-  if ('gte' in cond) return value >= cond.gte!
-  if ('lt' in cond) return value < cond.lt!
-  if ('lte' in cond) return value <= cond.lte!
+  const operator = keys[0]
+  const payload = condition[operator]
 
-  throw new EngineError(
-    'E_CONDITION_INVALID',
-    `No operator specified for condition on "${cond.var}"`
-  )
+  const handler = plugins.findConditionHandler(operator)
+
+  if (!handler) {
+    throw new EngineError(
+      'E_CONDITION_INVALID',
+      `Unknown condition operator "${operator}"`
+    )
+  }
+
+  return handler(payload, session, model)
 }
 
 /* ============================================================
- * Logical Conditions
+ * LOGICAL CONDITIONS
  * ============================================================
  */
 
 function evaluateLogical(
   cond: LogicalCondition,
-  session: GameSession
+  session: GameSession,
+  model: NormalizedGameModel,
+  plugins: PluginRegistry
 ): boolean {
   if (cond.all) {
-    return cond.all.every(c => evaluateCondition(c, session))
+    return cond.all.every(c =>
+      evaluateCondition(c, session, model, plugins)
+    )
   }
 
   if (cond.any) {
-    return cond.any.some(c => evaluateCondition(c, session))
+    return cond.any.some(c =>
+      evaluateCondition(c, session, model, plugins)
+    )
   }
 
   if (cond.not) {
-    return !evaluateCondition(cond.not, session)
+    return !evaluateCondition(cond.not, session, model, plugins)
   }
 
   throw new EngineError(
     'E_CONDITION_INVALID',
     'Empty logical condition'
   )
-}
-
-/* ============================================================
- * Type Guards
- * ============================================================
- */
-
-function isPrimitiveCondition(c: Condition): c is PrimitiveCondition {
-  return 'var' in c
 }
 
 function isLogicalCondition(c: Condition): c is LogicalCondition {
