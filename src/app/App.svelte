@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { loadGameFiles } from '../engine/io/loader'
-  import { validateGameData } from '../engine/schema/validate'
-  import { normalizeGameData } from '../engine/schema/normalize'
-  import { Engine } from '../engine/runtime/engine'
-  import { engineStore } from './engineStore'
-  import { get } from 'svelte/store'
+  import { loadGameFiles } from "../engine/io/loader";
+  import { validateGameData } from "../engine/schema/validate";
+  import { normalizeGameData } from "../engine/schema/normalize";
+  import { Engine } from "../engine/runtime/engine";
+  import { engineStore } from "./engineStore";
+  import { get } from "svelte/store";
   import type {
     GameManifest,
     RulesConfig,
@@ -13,16 +13,18 @@
     LocalizationBundle,
     ParsedGameData,
     ItemsFile,
-  } from '../engine/schema/types'
+  } from "../engine/schema/types";
 
-  import DebugOverlay from '../ui/debug/DebugOverlay.svelte'
+  import DebugOverlay from "../ui/debug/DebugOverlay.svelte";
+  import Typewriter from "../ui/components/Typewriter.svelte";
+  import Cursor from "../ui/components/Cursor.svelte";
 
-  let error: string | null = null
-  const DEV = true
-  let debugVisible = true
+  let error: string | null = null;
+  const DEV = true;
+  let debugVisible = true;
 
   try {
-    const files = loadGameFiles()
+    const files = loadGameFiles();
 
     const data: ParsedGameData = {
       manifest: files.game.value as GameManifest,
@@ -33,40 +35,40 @@
         Object.entries(files.scenes).map(([k, v]) => [
           k,
           v.value as SceneDefinition,
-        ])
+        ]),
       ),
       localization: Object.fromEntries(
         Object.entries(files.localization).map(([k, v]) => [
           k,
           v.value as LocalizationBundle[string],
-        ])
+        ]),
       ),
-    }
+    };
 
-    validateGameData(data)
-    const model = normalizeGameData(data)
+    validateGameData(data);
+    const model = normalizeGameData(data);
 
-    const engineInstance = new Engine(model)
-    const vm = engineInstance.start()
+    const engineInstance = new Engine(model);
+    const vm = engineInstance.start();
 
     engineStore.set({
       engine: engineInstance,
       viewModel: vm,
-    })
+    });
   } catch (e) {
-    error = e instanceof Error ? e.toString() : String(e)
+    error = e instanceof Error ? e.toString() : String(e);
   }
 
   function onChoose(id: string) {
-    const state = get(engineStore)
-    if (!state.engine) return
+    const state = get(engineStore);
+    if (!state.engine) return;
 
-    const newVm = state.engine.choose(id)
+    const newVm = state.engine.choose(id);
 
     engineStore.set({
       engine: state.engine,
       viewModel: newVm,
-    })
+    });
   }
 </script>
 
@@ -76,32 +78,31 @@
   <div class="terminal">
     <pre class="error">{error}</pre>
   </div>
-
 {:else if $engineStore.viewModel}
   <div class="terminal">
-
     <div class="header">
       <h1>{$engineStore.viewModel.gameTitle}</h1>
 
       {#if DEV}
         <div class="node">
-          <i>{$engineStore.viewModel.sceneId}.{$engineStore.viewModel.nodeId}</i>
+          <i>{$engineStore.viewModel.sceneId}.{$engineStore.viewModel.nodeId}</i
+          >
         </div>
       {/if}
     </div>
 
     <div class="content">
-      {#each $engineStore.viewModel.text as line}
-        <p>{line}</p>
+      {#each $engineStore.viewModel.text as line, i}
+        <p>
+          <Typewriter text={line} speed={30} onComplete={() => {}} />
+        </p>
       {/each}
+      <Cursor />
     </div>
 
     <div class="choices">
       {#each $engineStore.viewModel.choices as c}
-        <button
-          on:click={() => onChoose(c.id)}
-          disabled={!c.enabled}
-        >
+        <button on:click={() => onChoose(c.id)} disabled={!c.enabled}>
           &gt; {c.text}
         </button>
       {/each}
@@ -129,7 +130,6 @@
         [ Toggle Debug ]
       </button>
     </div>
-
   </div>
 
   <DebugOverlay visible={debugVisible} />
@@ -142,9 +142,27 @@
     min-height: 100vh;
     padding: 32px;
     background: #0f1a14; /* dark greenish grey */
-    color: #8aff8a;       /* CRT green */
+    color: #8aff8a; /* CRT green */
     font-family: monospace;
     line-height: 1.6;
+    text-shadow: 0 0 4px rgba(0, 255, 0, 0.6);
+  }
+
+  .terminal::after {
+    content: "";
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 255, 0, 0.03),
+      rgba(0, 255, 0, 0.03) 1px,
+      transparent 1px,
+      transparent 3px
+    );
   }
 
   .header h1 {
