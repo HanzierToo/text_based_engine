@@ -21,7 +21,7 @@
 
   let error: string | null = null;
   const DEV = true;
-  let debugVisible = true;
+  let debugVisible = false;
 
   try {
     const files = loadGameFiles();
