@@ -5,6 +5,13 @@ scene:
     - id: main
       text:
         - key: boiler.floor.main
+
+        - if:
+            eq:
+              var: worker_warning
+              value: true
+          then:
+            key: boiler.floor.main_worker_warning
       choices:
         - id: inspect_valve
           text: boiler.choice.inspect_valve
@@ -30,6 +37,9 @@ scene:
       effects:
         - add_item:
             id: valve_key
+        - set:
+            var: has_valve_key
+            value: true
       choices:
         - id: back_main
           text: boiler.choice.back

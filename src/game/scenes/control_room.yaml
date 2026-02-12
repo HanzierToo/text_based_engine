@@ -5,6 +5,13 @@ scene:
     - id: entry
       text:
         - key: boiler.control.entry
+
+        - if:
+            eq:
+              var: discovered_tampering
+              value: true
+          then:
+            key: boiler.control.entry_tampering_found
       choices:
         - id: read_logs
           text: boiler.choice.read_logs

@@ -5,18 +5,35 @@ scene:
     - id: entrance
       text:
         - key: boiler.lower.entrance
+
         - if:
             eq:
               var: has_valve_key
               value: false
           then:
             key: boiler.lower.no_valve_key_hint
+
+        - if:
+            eq:
+              var: has_valve_key
+              value: true
+          then:
+            key: boiler.lower.valve_ready
+
         - if:
             eq:
               var: discovered_tampering
               value: false
           then:
             key: boiler.lower.no_tampering_hint
+
+        - if:
+            eq:
+              var: discovered_tampering
+              value: true
+          then:
+            key: boiler.lower.entrance_suspicion
+
       choices:
         - id: stabilize
           text: boiler.choice.stabilize

@@ -92,9 +92,9 @@
     </div>
 
     <div class="content">
-      {#each $engineStore.viewModel.text as line, i}
+      {#each $engineStore.viewModel.text as line, i (i + '-' + line)}
         <p>
-          <Typewriter text={line} speed={30} onComplete={() => {}} />
+          <Typewriter text={line} speed={20} onComplete={() => {}} />
         </p>
       {/each}
       <Cursor />
