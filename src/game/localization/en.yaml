@@ -13,16 +13,23 @@ boiler:
     retreat: "Retreat to control room"
     proceed_end: "Complete inspection and file report"
     stabilize_after: "Stabilize the regulator"
+    take_valve_key: "Take the valve key"
+    listen_worker: "Press the machinist for details"
+    submit_report: "Submit official report"
 
   item:
     badge:
       name: "Inspection Badge"
+      description: "Test1"
     valve_key:
       name: "Valve Key"
+      description: "Test2"
     log:
       name: "Maintenance Logbook"
+      description: "Test3"
     report:
       name: "Sealed Report"
+      description: "Test4"
 
   arrival:
     dock: >
@@ -49,6 +56,9 @@ boiler:
       Management says it's drift.
       It isn't drift."
 
+    main_worker_warning: >
+      The machinist's warning lingers in your thoughts.
+
   control:
     entry: >
       The control room overlooks the boiler core through reinforced glass.
@@ -56,9 +66,12 @@ boiler:
       The central pressure needle vibrates against its housing.
 
     logs: >
-      The maintenance ledger shows repeated recalibrations filed and overwritt
+      The maintenance ledger shows repeated recalibrations filed and overwritten.
       Several entries are signed, then crossed out.
       Someone adjusted tolerance limits upward.
+
+    entry_tampering_found: >
+      The falsified calibration logs shift your perception of the room.
 
   lower:
     entrance: >
@@ -84,6 +97,12 @@ boiler:
       Filed.
       The boiler was forced to tolerate higher pressure than design allowed.
 
+    valve_ready: >
+      With the valve key in hand, manual adjustment is possible.
+
+    entrance_suspicion: >
+      Knowing the regulator was altered changes the meaning of every vibration.
+
   conclusion:
     final: >
       Boiler 7 stabilizes under your intervention.
@@ -105,3 +124,9 @@ boiler:
       You restrict your report to mechanical anomalies.
       Quietly.
       Whatever this was, it will remain buried.
+
+    end: >
+      The report is sealed and filed.
+      Boiler 7 will hold — for now.
+      Whatever forces strained the regulator remain outside the scope of your duty.
+      The district sleeps with its lights intact.

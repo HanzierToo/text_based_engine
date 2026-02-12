@@ -1,16 +1,16 @@
 items:
   inspector_badge:
     name: boiler.item.badge.name
-    description: "test"
+    description: boiler.item.badge.description
 
   valve_key:
-    name: "boiler.item.valve_key.name"
-    description: "test"
+    name: boiler.item.valve_key.name
+    description: boiler.item.valve_key.description
 
   maintenance_log:
     name: boiler.item.log.name
-    description: "test"
+    description: boiler.item.log.description
 
   sealed_report:
     name: boiler.item.report.name
-    description: "test"
+    description: boiler.item.report.description

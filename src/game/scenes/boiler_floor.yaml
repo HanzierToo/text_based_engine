@@ -12,6 +12,7 @@ scene:
               value: true
           then:
             key: boiler.floor.main_worker_warning
+
       choices:
         - id: inspect_valve
           text: boiler.choice.inspect_valve
@@ -34,13 +35,23 @@ scene:
     - id: valve
       text:
         - key: boiler.floor.valve
-      effects:
-        - add_item:
-            id: valve_key
-        - set:
-            var: has_valve_key
-            value: true
       choices:
+        - id: take_valve_key
+          text: boiler.choice.take_valve_key
+          if:
+            eq:
+              var: has_valve_key
+              value: false
+          effects:
+            - add_item:
+                id: valve_key
+            - set:
+                var: has_valve_key
+                value: true
+          goto:
+            scene: boiler_floor
+            node: main
+
         - id: back_main
           text: boiler.choice.back
           goto:
@@ -50,14 +61,24 @@ scene:
     - id: worker
       text:
         - key: boiler.floor.worker
-      effects:
-        - set:
-            var: worker_warning
-            value: true
-        - add:
-            var: trust_level
-            value: 1
       choices:
+        - id: listen_worker
+          text: boiler.choice.listen_worker
+          if:
+            eq:
+              var: worker_warning
+              value: false
+          effects:
+            - set:
+                var: worker_warning
+                value: true
+            - add:
+                var: trust_level
+                value: 1
+          goto:
+            scene: boiler_floor
+            node: main
+
         - id: back_main
           text: boiler.choice.back
           goto:

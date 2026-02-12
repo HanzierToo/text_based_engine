@@ -1,6 +1,27 @@
 state:
   variables:
+
     has_valve_key:
+      type: boolean
+      initial: false
+      visible: true
+
+    worker_warning:
+      type: boolean
+      initial: false
+      visible: true
+
+    discovered_tampering:
+      type: boolean
+      initial: false
+      visible: true
+
+    investigated_regulator:
+      type: boolean
+      initial: false
+      visible: true
+
+    report_submitted:
       type: boolean
       initial: false
       visible: true
@@ -13,19 +34,4 @@ state:
     pressure_level:
       type: number
       initial: 3
-      visible: true
-
-    discovered_tampering:
-      type: boolean
-      initial: false
-      visible: true
-
-    worker_warning:
-      type: boolean
-      initial: false
-      visible: true
-
-    report_submitted:
-      type: boolean
-      initial: false
       visible: true

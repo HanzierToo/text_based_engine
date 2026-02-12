@@ -90,10 +90,21 @@ export class Engine {
             `Inventory contains unknown item "${id}"`
           )
         }
+
+        const resolveKeySafe = (key?: string) => {
+          if (!key) return undefined
+          return resolveText(
+            [{ key }],
+            this.session,
+            this.model,
+            this.plugins
+          )[0]
+        }
+
         return {
           id,
-          name: def.name,
-          description: def.description,
+          name: resolveKeySafe(def.name) ?? def.name,
+          description: resolveKeySafe(def.description) ?? def.description,
         }
       }),
     }

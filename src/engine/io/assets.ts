@@ -48,8 +48,6 @@ export function collectRawGameAssets(): RawGameAssets {
   if (!state) throw new Error('Missing required file: state.yaml')
   if (!items) throw new Error('Missing required file: items.yaml')
 
-  console.log(items)
-
   return {
     game,
     rules,

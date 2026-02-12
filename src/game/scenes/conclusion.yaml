@@ -26,10 +26,25 @@ scene:
               value: 0
           then:
             key: boiler.conclusion.isolated
-      effects:
-        - add_item:
-            id: sealed_report
-        - set:
-            var: report_submitted
-            value: true
+
+      choices:
+        - id: submit_report
+          text: boiler.choice.submit_report
+          if:
+            eq:
+              var: report_submitted
+              value: false
+          effects:
+            - add_item:
+                id: sealed_report
+            - set:
+                var: report_submitted
+                value: true
+          goto:
+            scene: conclusion
+            node: end
+
+    - id: end
+      text:
+        - key: boiler.conclusion.end
       choices: []

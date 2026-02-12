@@ -12,12 +12,23 @@ scene:
               value: true
           then:
             key: boiler.control.entry_tampering_found
+
       choices:
         - id: read_logs
           text: boiler.choice.read_logs
+          if:
+            eq:
+              var: discovered_tampering
+              value: false
+          effects:
+            - add_item:
+                id: maintenance_log
+            - set:
+                var: discovered_tampering
+                value: true
           goto:
             scene: control_room
-            node: logs
+            node: entry
 
         - id: descend
           text: boiler.choice.descend
@@ -30,19 +41,3 @@ scene:
           goto:
             scene: boiler_floor
             node: main
-
-    - id: logs
-      text:
-        - key: boiler.control.logs
-      effects:
-        - add_item:
-            id: maintenance_log
-        - set:
-            var: discovered_tampering
-            value: true
-      choices:
-        - id: back_entry
-          text: boiler.choice.back
-          goto:
-            scene: control_room
-            node: entry

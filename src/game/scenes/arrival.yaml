@@ -5,12 +5,12 @@ scene:
     - id: dock
       text:
         - key: boiler.arrival.dock
-      effects:
-        - add_item:
-            id: inspector_badge
       choices:
         - id: enter_floor
           text: boiler.choice.enter_floor
+          effects:
+            - add_item:
+                id: inspector_badge
           goto:
             scene: boiler_floor
             node: main
