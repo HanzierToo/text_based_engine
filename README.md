@@ -5,6 +5,12 @@ A modular, YAML-driven text adventure engine built with Svelte and TypeScript.
 This project separates **engine runtime**, **game data**, and **UI**.  
 Games are defined entirely through `.yaml` files. No JavaScript required to create content.
 
+> **NOTICE:** This README does **NOT** contain information on how to make a game or game-specific information.
+>
+> That information is inside another `README.md` file within the `game/` sub-directory inside the `src/` repository.
+>
+> If you're not familiar with GitHub, press the `src` folder, then the `game` folder. Otherwise, [open this url](https://github.com/HanzierToo/text_based_engine/tree/main/src/game).
+
 ---
 
 ## Features
