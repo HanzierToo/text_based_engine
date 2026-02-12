@@ -2,10 +2,12 @@
 
 This directory contains all game content.
 
-The engine reads only YAML files from here.  
+The engine reads only YAML files from here.
 No JavaScript is required to build a game.
 
 All logic, structure, and content are defined declaratively.
+
+The engine validates strictly and fails fast. There are no silent fallbacks.
 
 ---
 
@@ -20,12 +22,10 @@ game/
 ┣ scenes/
 ┃ ┗ *.yaml
 ┗ localization/
-┗ *.yaml
+  ┗ *.yaml
 ```
 
-Each file has a strict schema. Missing or malformed fields will cause validation failure.
-
-The engine fails fast. There are no silent fallbacks.
+Each file has a strict schema. Missing or malformed fields cause validation failure.
 
 ---
 
@@ -60,22 +60,29 @@ game:
 ```
 
 ❌ Missing `version` and `start`
-→ Engine throws `E_SCHEMA_MISSING_FIELD`
+→ `E_SCHEMA_MISSING_FIELD`
 
 ---
 
 # 2. rules.yaml
 
-Enables systems (plugins).
+Enables engine systems (plugins).
 
 ```yaml
 rules:
   systems:
     randomness: true
     inventory: true
+  state_visibility:
+    default: visible
 ```
 
-If a system is disabled, its operators cannot be used.
+### Systems (v0.1)
+
+* `randomness`
+* `inventory`
+
+If a system is disabled, its operators cannot be used anywhere in scenes.
 
 ### Invalid Example
 
@@ -115,15 +122,17 @@ state:
 
 * `type`: `boolean | number | string`
 * `initial`: must match `type`
-* `visible`: if true, shown in ViewModel
+* `visible`: if true, exposed in ViewModel
 * `requires` (optional): requires a system
 
 ### Invalid Example
 
 ```yaml
-has_key:
-  type: boolean
-  initial: 1
+state:
+  variables:
+    has_key:
+      type: boolean
+      initial: 1
 ```
 
 ❌ Type mismatch
@@ -140,9 +149,11 @@ Inventory references MUST exist here.
 ```yaml
 items:
   intro_key:
-    name: "Rusty Key"
-    description: "An old brass key."
+    name: boiler.item.key.name
+    description: boiler.item.key.description
 ```
+
+`name` and `description` should be localization keys.
 
 ### Required Fields
 
@@ -193,41 +204,116 @@ scene:
     - choice definition
 ```
 
+Each node must have:
+
+* `id`
+* `text`
+* `choices`
+
 ---
 
 # Text Fragments
 
-Text supports:
+Text supports three formats.
 
-### 1. Plain strings
+---
+
+### 1. Plain Strings
 
 ```yaml
 - "You stand in a room."
 ```
 
-### 2. Localization
+---
+
+### 2. Localization Keys
 
 ```yaml
-- key: intro.room
+- key: boiler.arrival.dock
 ```
 
-### 3. Conditional fragments
+---
+
+### 3. Conditional Fragments
 
 ```yaml
 - if:
     eq:
       var: has_key
       value: true
-  then: "You hold the key."
+  then:
+    key: boiler.floor.has_key
 ```
 
-(v0.1: only single condition per fragment)
+(v0.1: single condition only)
+
+---
+
+# Conditions (Operator-Based, v0.1)
+
+Conditions use operator syntax:
+
+```yaml
+eq:
+  var: has_key
+  value: true
+```
+
+Supported operators:
+
+* `eq`
+* `neq`
+* `gt`
+* `gte`
+* `lt`
+* `lte`
+* `has_item`
+* `all`
+* `any`
+* `not`
+
+---
+
+### Example
+
+```yaml
+if:
+  has_item:
+    id: intro_key
+```
+
+---
+
+### Logical Example
+
+```yaml
+if:
+  all:
+    - eq:
+        var: has_key
+        value: true
+    - has_item:
+        id: intro_key
+```
+
+---
+
+### Invalid Example
+
+```yaml
+if:
+  var: has_key
+  eq: true
+```
+
+❌ Old syntax
+→ `E_CONDITION_INVALID`
 
 ---
 
 # Inline Interpolation (v0.1)
 
-Inside strings:
+Inside string fragments:
 
 ```
 {{variable}}
@@ -246,33 +332,19 @@ Example:
 
 # Inline Conditional Blocks (v0.1)
 
-Inside strings:
+```
+{{if eq has_key true}}You feel confident.{{/if}}
+```
 
 ```
 {{if has_item intro_key}}You unlock the door.{{/if}}
 ```
 
-Supported operators:
-
-* `eq`
-* `neq`
-* `gt`
-* `gte`
-* `lt`
-* `lte`
-* `has_item`
-
-Example:
-
-```
-{{if eq has_key true}}You feel confident.{{/if}}
-```
-
-Limitations (v0.1):
+Limitations:
 
 * No nesting
 * Single condition only
-* Strict syntax required
+* Strict syntax
 
 Invalid:
 
@@ -288,7 +360,7 @@ Invalid:
 
 ```yaml
 - id: take_key
-  text: "Pick up the key"
+  text: boiler.choice.take_key
   if:
     eq:
       var: has_key
@@ -316,6 +388,8 @@ Invalid:
     value: true
 ```
 
+---
+
 ## add
 
 ```yaml
@@ -323,6 +397,8 @@ Invalid:
     var: score
     value: 1
 ```
+
+---
 
 ## add_item
 
@@ -358,7 +434,7 @@ Format: `"numerator/denominator"`
 
 Example:
 
-`"1/10"` → 10% chance
+* `"1/10"` → 10% chance
 
 Invalid:
 
@@ -372,58 +448,69 @@ random: "10%"
 
 # Localization
 
-In `localization/en.yaml`:
+Files are located in:
+
+```
+game/localization/*.yaml
+```
+
+Example `en.yaml`:
 
 ```yaml
-intro:
-  room: "You stand in a dark room."
+boiler:
+  arrival:
+    dock: "The river fog hangs low over Dock 17."
 ```
 
 Usage:
 
 ```yaml
-- key: intro.room
+- key: boiler.arrival.dock
 ```
 
-Format must be:
+Localization keys:
 
 ```
-namespace.key
+namespace.subkey.subkey
 ```
+
+There is no need to prefix language (e.g., `en.`).
+Language is handled internally by the engine.
 
 Invalid:
 
 ```
-intro.room.extra
+boiler.arrival
 ```
 
+If it does not resolve to a string
 → `E_LOCALIZATION_KEY_MISSING`
 
 ---
 
-## Common Errors
+# Common Errors
 
-| Error                       | Meaning                                             |
-| --------------------------- | --------------------------------------------------- |
-| E_YAML_PARSE                | Error parsing YAML input                            |
-| E_SCHEMA_MISSING_FIELD      | Required YAML field missing                         |
-| E_SCHEMA_INVALID_TYPE       | Field has an invalid type                           |
-| E_REF_NOT_FOUND_SCENE       | Referenced scene not found                          |
-| E_REF_NOT_FOUND_NODE        | Referenced node not found                           |
-| E_REF_NOT_FOUND             | Referenced scene/node/item not found                |
-| E_DUPLICATE_ID              | Duplicate scene/node ID                             |
-| E_STATE_VAR_UNDECLARED      | State variable referenced but not declared          |
-| E_STATE_TYPE_MISMATCH       | State variable initial value has wrong type         |
-| E_SYSTEM_DISABLED_USAGE     | Operator used from a disabled system                |
-| E_CONDITION_INVALID         | Invalid condition syntax                            |
-| E_EFFECT_INVALID            | Invalid effect syntax                               |
-| E_LOCALIZATION_KEY_MISSING  | Localization key missing                            |
-| E_RUNTIME_ILLEGAL_CHOICE    | Choice is not allowed at runtime (illegal choice)   |
-| E_PLUGIN_REGISTRY_LOCKED    | Plugin registry is locked (no further registrations)|
-| E_PLUGIN_DUPLICATE_ID       | Plugin with duplicate id registered                 |
-| E_PLUGIN_DEPENDENCY_MISSING | Plugin dependency is missing                        |
-| E_PLUGIN_ORDER_UNKNOWN      | Plugin order could not be determined                |
-| E_PLUGIN_ORDER_CYCLE        | Plugin ordering contains a cycle                    |
+| Error                       | Meaning                     |
+| --------------------------- | --------------------------- |
+| E_YAML_PARSE                | Error parsing YAML          |
+| E_SCHEMA_MISSING_FIELD      | Required field missing      |
+| E_SCHEMA_INVALID_TYPE       | Invalid field type          |
+| E_REF_NOT_FOUND_SCENE       | Referenced scene not found  |
+| E_REF_NOT_FOUND_NODE        | Referenced node not found   |
+| E_REF_NOT_FOUND             | Referenced item not found   |
+| E_DUPLICATE_ID              | Duplicate scene/node ID     |
+| E_STATE_VAR_UNDECLARED      | Undeclared state variable   |
+| E_STATE_TYPE_MISMATCH       | Initial value type mismatch |
+| E_SYSTEM_DISABLED_USAGE     | Disabled system used        |
+| E_CONDITION_INVALID         | Invalid condition syntax    |
+| E_EFFECT_INVALID            | Invalid effect syntax       |
+| E_LOCALIZATION_KEY_MISSING  | Localization key missing    |
+| E_RUNTIME_ILLEGAL_CHOICE    | Illegal choice at runtime   |
+| E_PLUGIN_REGISTRY_LOCKED    | Plugin registry locked      |
+| E_PLUGIN_DUPLICATE_ID       | Duplicate plugin ID         |
+| E_PLUGIN_DEPENDENCY_MISSING | Plugin dependency missing   |
+| E_PLUGIN_ORDER_UNKNOWN      | Plugin order undetermined   |
+| E_PLUGIN_ORDER_CYCLE        | Plugin order cycle detected |
 
 ---
 
@@ -433,7 +520,8 @@ intro.room.extra
 * No implicit fallbacks
 * Registry-backed references
 * Deterministic runtime
-* Content separated from engine
+* Declarative content
+* Strict validation
 
 If something is wrong, the engine stops.
 
@@ -444,20 +532,10 @@ If something is wrong, the engine stops.
 * No nested inline conditionals
 * No combat system
 * No statistics plugin
-* No branching dialogue history system
-* No UI layout customization
+* No dialogue history system
+* No UI customization
 * No mod loading
 * No multiplayer
-
----
-
-# Best Practices
-
-* Keep scene files small and modular
-* Use localization for reusable strings
-* Avoid large logic blocks in text strings
-* Validate frequently during development
-* Enable only required systems
 
 ---
 

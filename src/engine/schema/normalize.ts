@@ -20,6 +20,7 @@ export interface NormalizedGameModel {
   items: Map<string, ItemDefinition>
   scenes: Map<string, NormalizedScene>
   localization: ParsedGameData['localization']
+  language: string
 }
 
 export interface NormalizedState {
@@ -58,6 +59,7 @@ export function normalizeGameData(
     items: normalizeItems(data),
     scenes: normalizeScenes(data),
     localization: data.localization,
+    language: "en",
   }
 }
 

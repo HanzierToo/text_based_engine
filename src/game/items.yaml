@@ -1,4 +1,16 @@
 items:
-  intro_key:
-    name: "Small Brass Key"
-    description: "A small brass key that looks old but sturdy."
+  inspector_badge:
+    name: boiler.item.badge.name
+    description: "test"
+
+  valve_key:
+    name: "boiler.item.valve_key.name"
+    description: "test"
+
+  maintenance_log:
+    name: boiler.item.log.name
+    description: "test"
+
+  sealed_report:
+    name: boiler.item.report.name
+    description: "test"

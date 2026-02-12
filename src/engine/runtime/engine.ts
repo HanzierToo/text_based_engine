@@ -72,10 +72,13 @@ export class Engine {
       nodeId: at.node,
       text: resolveText(node.text, this.session, this.model, this.plugins),
       choices: node.choices
-        .filter(c => !c.if || evaluateCondition(c.if, this.session, this.model, this.plugins))
+        .filter(c =>
+          !c.if ||
+          evaluateCondition(c.if, this.session, this.model, this.plugins)
+        )
         .map(c => ({
           id: c.id,
-          text: c.text,
+          text: this.resolveChoiceText(c.text),
           enabled: true,
         })),
       visibleState: this.session.getVisibleState(),
@@ -94,6 +97,25 @@ export class Engine {
         }
       }),
     }
+  }
+
+  private resolveChoiceText(text: string): string {
+    // If it looks like a localization key, resolve it.
+    if (text.includes('.')) {
+      try {
+        return resolveText(
+          [{ key: text }],
+          this.session,
+          this.model,
+          this.plugins
+        )[0]
+      } catch {
+        // If resolution fails, fall back to literal
+        return text
+      }
+    }
+
+    return text
   }
 
   choose(choiceId: string): ViewModel {

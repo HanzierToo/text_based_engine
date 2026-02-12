@@ -1,0 +1,41 @@
+scene:
+  id: control_room
+  nodes:
+
+    - id: entry
+      text:
+        - key: boiler.control.entry
+      choices:
+        - id: read_logs
+          text: boiler.choice.read_logs
+          goto:
+            scene: control_room
+            node: logs
+
+        - id: descend
+          text: boiler.choice.descend
+          goto:
+            scene: lower_chamber
+            node: entrance
+
+        - id: return_floor
+          text: boiler.choice.return
+          goto:
+            scene: boiler_floor
+            node: main
+
+    - id: logs
+      text:
+        - key: boiler.control.logs
+      effects:
+        - add_item:
+            id: maintenance_log
+        - set:
+            var: discovered_tampering
+            value: true
+      choices:
+        - id: back_entry
+          text: boiler.choice.back
+          goto:
+            scene: control_room
+            node: entry

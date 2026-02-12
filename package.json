@@ -10,6 +10,7 @@
     "typecheck": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
+    "@rollup/plugin-yaml": "^4.1.2",
     "svelte": "^4.2.8",
     "yaml": "^2.5.1"
   },

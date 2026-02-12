@@ -1,6 +1,31 @@
 state:
   variables:
-    has_key:
+    has_valve_key:
+      type: boolean
+      initial: false
+      visible: true
+
+    trust_level:
+      type: number
+      initial: 0
+      visible: true
+
+    pressure_level:
+      type: number
+      initial: 3
+      visible: true
+
+    discovered_tampering:
+      type: boolean
+      initial: false
+      visible: true
+
+    worker_warning:
+      type: boolean
+      initial: false
+      visible: true
+
+    report_submitted:
       type: boolean
       initial: false
       visible: true

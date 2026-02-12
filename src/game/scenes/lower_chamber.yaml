@@ -1,0 +1,73 @@
+scene:
+  id: lower_chamber
+  nodes:
+
+    - id: entrance
+      text:
+        - key: boiler.lower.entrance
+        - if:
+            eq:
+              var: has_valve_key
+              value: false
+          then:
+            key: boiler.lower.no_valve_key_hint
+        - if:
+            eq:
+              var: discovered_tampering
+              value: false
+          then:
+            key: boiler.lower.no_tampering_hint
+      choices:
+        - id: stabilize
+          text: boiler.choice.stabilize
+          if:
+            eq:
+              var: has_valve_key
+              value: true
+          goto:
+            scene: lower_chamber
+            node: stabilize
+
+        - id: investigate
+          text: boiler.choice.investigate
+          if:
+            eq:
+              var: discovered_tampering
+              value: true
+          goto:
+            scene: lower_chamber
+            node: tampering
+
+        - id: retreat
+          text: boiler.choice.retreat
+          goto:
+            scene: control_room
+            node: entry
+
+    - id: stabilize
+      text:
+        - key: boiler.lower.stabilize
+      effects:
+        - add:
+            var: pressure_level
+            value: -1
+      choices:
+        - id: proceed_end
+          text: boiler.choice.proceed_end
+          goto:
+            scene: conclusion
+            node: final
+
+    - id: tampering
+      text:
+        - key: boiler.lower.tampering
+      effects:
+        - add:
+            var: trust_level
+            value: -1
+      choices:
+        - id: stabilize_after
+          text: boiler.choice.stabilize_after
+          goto:
+            scene: lower_chamber
+            node: stabilize

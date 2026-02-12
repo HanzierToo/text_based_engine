@@ -1,2 +1,107 @@
-demo:
-  placeholder: "Placeholder"
+boiler:
+  choice:
+    enter_floor: "Enter the boiler floor"
+    inspect_valve: "Inspect the auxiliary manifold"
+    speak_worker: "Speak to the machinist"
+    go_control: "Proceed to the control room"
+    read_logs: "Review maintenance logs"
+    descend: "Descend to the lower chamber"
+    return: "Return to the boiler floor"
+    back: "Go back"
+    stabilize: "Attempt manual stabilization"
+    investigate: "Inspect regulator housing"
+    retreat: "Retreat to control room"
+    proceed_end: "Complete inspection and file report"
+    stabilize_after: "Stabilize the regulator"
+
+  item:
+    badge:
+      name: "Inspection Badge"
+    valve_key:
+      name: "Valve Key"
+    log:
+      name: "Maintenance Logbook"
+    report:
+      name: "Sealed Report"
+
+  arrival:
+    dock: >
+      The river fog hangs low over Dock 17.
+      Boiler 7's exhaust tower cuts through the mist like a blade.
+      The district depends on this unit. If it fails, half the lower wards go dark.
+      Your inspection orders are stamped urgent.
+
+  floor:
+    main: >
+      The boiler floor trembles beneath rotating pistons and hissing valves.
+      Workers move with deliberate efficiency, but conversations stop when you pass.
+      Pressure gauges along the far wall flicker slightly above normal range.
+
+    valve: >
+      The auxiliary pressure manifold is partially disassembled.
+      A heavy brass valve key rests on a maintenance hook.
+      No one seems eager to claim responsibility.
+
+    worker: >
+      A soot-streaked machinist glances at your badge, then away.
+      After a pause, they lean closer.
+      "The readings started spiking three nights ago.
+      Management says it's drift.
+      It isn't drift."
+
+  control:
+    entry: >
+      The control room overlooks the boiler core through reinforced glass.
+      Brass levers line the console.
+      The central pressure needle vibrates against its housing.
+
+    logs: >
+      The maintenance ledger shows repeated recalibrations filed and overwritt
+      Several entries are signed, then crossed out.
+      Someone adjusted tolerance limits upward.
+
+  lower:
+    entrance: >
+      The lower chamber radiates dry heat.
+      Steam condenses along the iron ribs of the chamber walls.
+      The primary regulator housing groans under strain.
+
+    no_valve_key_hint: >
+      Without the proper valve key, any manual adjustment would be reckless.
+
+    no_tampering_hint: >
+      Nothing here immediately suggests deliberate interference.
+      It could still be mechanical fatigue.
+
+    stabilize: >
+      You slot the valve key into the regulator assembly.
+      A controlled counterturn releases trapped pressure in measured bursts.
+      The chamber's vibration eases, though the system remains fragile.
+
+    tampering: >
+      Behind the regulator casing, a calibration stop has been filed down.
+      Not worn.
+      Filed.
+      The boiler was forced to tolerate higher pressure than design allowed.
+
+  conclusion:
+    final: >
+      Boiler 7 stabilizes under your intervention.
+      The district lights will hold tonight.
+      What follows depends on what you choose to report.
+
+    neutral: >
+      You file a technical summary.
+      No accusations.
+      No names.
+      The Guild will review internally.
+
+    worker_trust: >
+      You attach documentation of the tampering.
+      The machinists will know someone listened.
+      The Guild will not appreciate the implication.
+
+    isolated: >
+      You restrict your report to mechanical anomalies.
+      Quietly.
+      Whatever this was, it will remain buried.

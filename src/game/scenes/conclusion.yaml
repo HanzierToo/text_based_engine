@@ -1,0 +1,35 @@
+scene:
+  id: conclusion
+  nodes:
+
+    - id: final
+      text:
+        - key: boiler.conclusion.final
+
+        - if:
+            eq:
+              var: trust_level
+              value: 0
+          then:
+            key: boiler.conclusion.neutral
+
+        - if:
+            gt:
+              var: trust_level
+              value: 0
+          then:
+            key: boiler.conclusion.worker_trust
+
+        - if:
+            lt:
+              var: trust_level
+              value: 0
+          then:
+            key: boiler.conclusion.isolated
+      effects:
+        - add_item:
+            id: sealed_report
+        - set:
+            var: report_submitted
+            value: true
+      choices: []

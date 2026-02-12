@@ -12,7 +12,8 @@ export type RawGameAssets = {
 export function collectRawGameAssets(): RawGameAssets {
   // Load all yaml files under src/game
   const files = import.meta.glob('/src/game/**/*.yaml', {
-    as: 'raw',
+    query: '?raw',
+    import: 'default',
     eager: true,
   }) as Record<string, string>
 
@@ -46,6 +47,8 @@ export function collectRawGameAssets(): RawGameAssets {
   if (!rules) throw new Error('Missing required file: rules.yaml')
   if (!state) throw new Error('Missing required file: state.yaml')
   if (!items) throw new Error('Missing required file: items.yaml')
+
+  console.log(items)
 
   return {
     game,

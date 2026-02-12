@@ -1,0 +1,55 @@
+scene:
+  id: boiler_floor
+  nodes:
+
+    - id: main
+      text:
+        - key: boiler.floor.main
+      choices:
+        - id: inspect_valve
+          text: boiler.choice.inspect_valve
+          goto:
+            scene: boiler_floor
+            node: valve
+
+        - id: speak_worker
+          text: boiler.choice.speak_worker
+          goto:
+            scene: boiler_floor
+            node: worker
+
+        - id: go_control
+          text: boiler.choice.go_control
+          goto:
+            scene: control_room
+            node: entry
+
+    - id: valve
+      text:
+        - key: boiler.floor.valve
+      effects:
+        - add_item:
+            id: valve_key
+      choices:
+        - id: back_main
+          text: boiler.choice.back
+          goto:
+            scene: boiler_floor
+            node: main
+
+    - id: worker
+      text:
+        - key: boiler.floor.worker
+      effects:
+        - set:
+            var: worker_warning
+            value: true
+        - add:
+            var: trust_level
+            value: 1
+      choices:
+        - id: back_main
+          text: boiler.choice.back
+          goto:
+            scene: boiler_floor
+            node: main

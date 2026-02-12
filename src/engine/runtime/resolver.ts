@@ -63,33 +63,38 @@ function resolveKey(
   key: string,
   model: NormalizedGameModel
 ): string {
+  const lang = model.language
+
+  const langBundle = model.localization[lang]
+  if (!langBundle) {
+    throw new EngineError(
+      'E_LOCALIZATION_KEY_MISSING',
+      `Language "${lang}" not loaded`
+    )
+  }
+
   const parts = key.split('.')
-  if (parts.length !== 2) {
+
+  let current: any = langBundle
+
+  for (const part of parts) {
+    current = current?.[part]
+    if (current === undefined) {
+      throw new EngineError(
+        'E_LOCALIZATION_KEY_MISSING',
+        `Localization key "${key}" not found for language "${lang}"`
+      )
+    }
+  }
+
+  if (typeof current !== 'string') {
     throw new EngineError(
       'E_LOCALIZATION_KEY_MISSING',
-      `Invalid localization key format "${key}"`
+      `Localization key "${key}" does not resolve to string`
     )
   }
 
-  const [namespace, entry] = parts
-
-  const bundle = model.localization[namespace]
-  if (!bundle) {
-    throw new EngineError(
-      'E_LOCALIZATION_KEY_MISSING',
-      `Localization namespace "${namespace}" not found`
-    )
-  }
-
-  const value = bundle[entry]
-  if (value === undefined) {
-    throw new EngineError(
-      'E_LOCALIZATION_KEY_MISSING',
-      `Localization key "${key}" not found`
-    )
-  }
-
-  return value
+  return current
 }
 
 /* ============================================================

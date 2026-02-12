@@ -1,12 +1,12 @@
 game:
-  id: demo_game
-  title: Demo Text Adventure
+  id: boiler_7
+  title: Boiler 7
   version: "0.1"
 
   start:
-    scene: intro
-    node: start
-
+    scene: arrival
+    node: dock
+  
   ui:
     theme: default
     text_speed: normal

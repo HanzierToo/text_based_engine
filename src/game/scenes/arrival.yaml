@@ -1,0 +1,16 @@
+scene:
+  id: arrival
+  nodes:
+
+    - id: dock
+      text:
+        - key: boiler.arrival.dock
+      effects:
+        - add_item:
+            id: inspector_badge
+      choices:
+        - id: enter_floor
+          text: boiler.choice.enter_floor
+          goto:
+            scene: boiler_floor
+            node: main
