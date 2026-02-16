@@ -6,6 +6,7 @@
   import { Engine } from "../engine/runtime/engine";
   import { engineStore } from "./engineStore";
   import { get } from "svelte/store";
+  import "../ui/theme.css";
 
   import DebugOverlay from "../ui/debug/DebugOverlay.svelte";
   import Typewriter from "../ui/components/Typewriter.svelte";
@@ -32,8 +33,29 @@
   let resolvedTextSpeed = 10; // default fallback
   let instantMode = false;
   let lastRenderedNodeKey: string | null = null;
+  let renderRevision = 0;
+
+  const speedModes: Array<GameManifest["game"]["ui"]["text_speed"]> = [
+    "slow",
+    "normal",
+    "fast",
+    "instant",
+  ];
+  let currentSpeedIndex = 1; // default to "normal"
+  let gameDefaultSpeedIndex = 1; // will be set when game starts
 
   const DEV = true;
+
+  let theme: "dark" | "light" = "dark";
+  let highContrast = false;
+
+  function toggleTheme() {
+    theme = theme === "dark" ? "light" : "dark";
+  }
+
+  function toggleHighContrast() {
+    highContrast = !highContrast;
+  }
 
   const allGames = collectAllRawGameAssets();
 
@@ -91,6 +113,14 @@
         parsedLocalization[namespace] =
           parseYaml(v, `localization/${k}`).value as LocalizationBundle;
       }
+
+      // Set game default speed index for cycling
+      const gameSpeed = parsedGame.game.ui.text_speed;
+      gameDefaultSpeedIndex = speedModes.indexOf(gameSpeed as typeof speedModes[number]);
+      if (gameDefaultSpeedIndex === -1) {
+        gameDefaultSpeedIndex = 1; // fallback to normal
+      }
+      currentSpeedIndex = gameDefaultSpeedIndex;
 
       const data: ParsedGameData = {
         manifest: parsedGame,
@@ -187,8 +217,6 @@
     if (!vm) return;
 
     const nodeKey = `${vm.sceneId}:${vm.nodeId}`;
-
-    // Ignore stale completions
     if (nodeKey !== lastRenderedNodeKey) return;
 
     currentLineIndex++;
@@ -227,171 +255,145 @@
         resolvedTextSpeed = 20;
     }
   }
+
+  function toggleTextSpeed() {
+    currentSpeedIndex = (currentSpeedIndex + 1) % speedModes.length;
+    const newSpeed = speedModes[currentSpeedIndex];
+    resolveTextSpeed(newSpeed);
+
+    const vm = get(engineStore).viewModel;
+    if (!vm) return;
+
+    renderRevision++;
+
+    currentLineIndex = 0;
+
+    if (instantMode) {
+      displayedLines = [...vm.text];
+      isTyping = false;
+    } else {
+      displayedLines = vm.text.length > 0 ? [vm.text[0]] : [];
+      isTyping = vm.text.length > 0;
+    }
+  }
 </script>
 
 {#if error}
-  <div class="terminal">
-    <pre class="error">{error}</pre>
+  <div class="terminal-wrapper {`theme-${theme}`} {highContrast ? "high-contrast" : ""}">
+    <div class="terminal">
+      <pre class="error">{error}</pre>
+    </div>
   </div>
 
 {:else if !selectedGameId}
-  <div class="terminal">
-    <h1>Insert Game Disc</h1>
-    <div class="choices">
-      {#each gameMetaList as game}
-        <button on:click={() => startGame(game.id)}>
-          &gt; {game.title}
+  <div class="terminal-wrapper {`theme-${theme}`} {highContrast ? "high-contrast" : ""}">
+    <div class="terminal">
+      <h1>Insert Game Disc</h1>
+      <div class="choices">
+        {#each gameMetaList as game}
+          <button on:click={() => startGame(game.id)}>
+            &gt; {game.title}
+          </button>
+        {/each}
+      </div>
+      <div class="controls">
+        <h3>Controls</h3>
+
+        <button on:click={() => (debugVisible = !debugVisible)}>
+          [ Toggle Debug ]
         </button>
-      {/each}
+        <button on:click={() => toggleTextSpeed()}>
+          [ Toggle Text Speed - {speedModes[currentSpeedIndex]}{currentSpeedIndex === gameDefaultSpeedIndex ? " - default value" : ""} ]
+        </button>
+        <button on:click={toggleTheme}>
+          [ Theme: {theme} ]
+        </button>
+        <button on:click={toggleHighContrast}>
+          [ High Contrast: {highContrast ? "ON" : "OFF"} ]
+        </button>
+      </div>
     </div>
   </div>
 
 {:else if $engineStore.viewModel}
-  <div class="terminal">
-    <div class="header">
-      <div class="title-row">
-        <h1>{selectedGameTitle}</h1>
-        <button class="eject" on:click={ejectDisc}>
-          [ Eject Disc ]
-        </button>
+  <div class="terminal-wrapper {`theme-${theme}`} {highContrast ? "high-contrast" : ""}">
+    <div class="terminal">
+      <div class="header">
+        <div class="title-row">
+          <h1>{selectedGameTitle}</h1>
+          <button class="eject" on:click={ejectDisc}>
+            [ Eject Disc ]
+          </button>
+        </div>
+
+        {#if DEV}
+          <div class="node">
+            <i>{$engineStore.viewModel.sceneId}.{$engineStore.viewModel.nodeId}</i>
+          </div>
+        {/if}
       </div>
 
-      {#if DEV}
-        <div class="node">
-          <i>{$engineStore.viewModel.sceneId}.{$engineStore.viewModel.nodeId}</i>
-        </div>
-      {/if}
-    </div>
+      <div class="content">
+        {#each displayedLines as line, i (`${lastRenderedNodeKey}-${renderRevision}-${i}`)}
+          <p>
+            {#if instantMode}
+              <span>{line}</span>
+            {:else}
+              <Typewriter
+                text={line}
+                speed={resolvedTextSpeed}
+                onComplete={i === displayedLines.length - 1 ? handleLineComplete : undefined}
+              />
+            {/if}
+          </p>
+        {/each}
 
-    <div class="content">
-      {#each displayedLines as line, i (`${lastRenderedNodeKey}-${i}`)}
-        <p>
-          {#if instantMode}
-            <span>{line}</span>
-          {:else}
-            <Typewriter
-              text={line}
-              speed={resolvedTextSpeed}
-              onComplete={i === displayedLines.length - 1 ? handleLineComplete : undefined}
-            />
-          {/if}
-        </p>
-      {/each}
+        {#if isTyping}
+          <Cursor />
+        {/if}
+      </div>
 
-      {#if isTyping}
-        <Cursor />
-      {/if}
-    </div>
+      <div class="choices">
+        {#each $engineStore.viewModel.choices as c}
+          <button on:click={() => onChoose(c.id)} disabled={!c.enabled}>
+            &gt; {c.text}
+          </button>
+        {/each}
+      </div>
 
-    <div class="choices">
-      {#each $engineStore.viewModel.choices as c}
-        <button on:click={() => onChoose(c.id)} disabled={!c.enabled}>
-          &gt; {c.text}
+      <div class="inventory">
+        <h3>Inventory</h3>
+
+        {#if $engineStore.viewModel.inventory.length === 0}
+          <p class="muted">(empty)</p>
+        {:else}
+          <ul>
+            {#each $engineStore.viewModel.inventory as item}
+              <li title={item.description}>
+                {item.name}
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
+      <div class="controls">
+        <h3>Controls</h3>
+
+        <button on:click={() => (debugVisible = !debugVisible)}>
+          [ Toggle Debug ]
         </button>
-      {/each}
-    </div>
-
-    <div class="inventory">
-      <h3>Inventory</h3>
-
-      {#if $engineStore.viewModel.inventory.length === 0}
-        <p class="muted">(empty)</p>
-      {:else}
-        <ul>
-          {#each $engineStore.viewModel.inventory as item}
-            <li title={item.description}>
-              {item.name}
-            </li>
-          {/each}
-        </ul>
-      {/if}
-    </div>
-
-    <div class="controls">
-      <button on:click={() => (debugVisible = !debugVisible)}>
-        [ Toggle Debug ]
-      </button>
+        <button on:click={() => toggleTextSpeed()}>
+          [ Toggle Text Speed - {speedModes[currentSpeedIndex]}{currentSpeedIndex === gameDefaultSpeedIndex ? " - default value" : ""} ]
+        </button>
+        <button on:click={toggleTheme}>
+          [ Theme: {theme} ]
+        </button>
+        <button on:click={toggleHighContrast}>
+          [ High Contrast: {highContrast ? "ON" : "OFF"} ]
+        </button>
+      </div>
     </div>
   </div>
 
   <DebugOverlay visible={debugVisible} />
 {/if}
-
-<style>
-  .terminal {
-    min-height: 100vh;
-    padding: 32px;
-    background: #0f1a14;
-    color: #8aff8a;
-    font-family: monospace;
-    line-height: 1.6;
-    text-shadow: 0 0 4px rgba(0, 255, 0, 0.6);
-  }
-
-  .terminal::after {
-    content: "";
-    pointer-events: none;
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(0, 255, 0, 0.03),
-      rgba(0, 255, 0, 0.03) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-  }
-
-  .title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 6px;
-  }
-
-  .eject {
-    margin-left: 24px;
-    border: 1px solid #3a5f3a;
-    background: transparent;
-    color: #8aff8a;
-    padding: 4px 8px;
-    font-family: monospace;
-    cursor: pointer;
-  }
-
-  .choices {
-    margin-top: 24px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .choices button {
-    background: transparent;
-    border: 1px solid #3a5f3a;
-    color: #8aff8a;
-    padding: 6px 10px;
-    font-family: monospace;
-    cursor: pointer;
-  }
-
-  .choices button:hover:not(:disabled),
-  .eject:hover {
-    background: #1f3327;
-  }
-
-  .inventory,
-  .controls {
-    margin-top: 32px;
-    border-top: 1px solid #2e4d2e;
-    padding-top: 12px;
-  }
-
-  .muted {
-    color: #4c7a4c;
-  }
-
-  .error {
-    color: #ff5555;
-  }
-</style>
