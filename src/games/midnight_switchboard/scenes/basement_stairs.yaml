@@ -1,0 +1,58 @@
+scene:
+  id: basement_stairs
+
+  nodes:
+
+    - id: stairs
+      text:
+        - key: midnight.basement.stairs_intro
+        - key: midnight.basement.status_line
+        - if:
+            gt:
+              var: anxiety
+              value: 2
+          then:
+            key: midnight.basement.hands_tremble
+        - if:
+            gt:
+              var: corruption
+              value: 1
+          then:
+            key: midnight.basement.shift_below
+      effects:
+        - set:
+            var: in_switchboard_room
+            value: false
+        - set:
+            var: in_basement
+            value: true
+      choices:
+
+        - id: descend_fully
+          text: midnight.choice.descend_fully
+          goto:
+            scene: basement_chamber
+            node: chamber
+
+        - id: hesitate
+          text: midnight.choice.hesitate
+          effects:
+            - add:
+                var: anxiety
+                value: 1
+          goto:
+            scene: basement_stairs
+            node: stairs
+
+        - id: retreat_upstairs
+          text: midnight.choice.retreat
+          effects:
+            - set:
+                var: in_switchboard_room
+                value: true
+            - set:
+                var: in_basement
+                value: false
+          goto:
+            scene: switchboard_room
+            node: main

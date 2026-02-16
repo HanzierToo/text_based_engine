@@ -1,0 +1,52 @@
+state:
+  variables:
+
+    # Narrative progression flags
+    call_answered:
+      type: boolean
+      initial: false
+      visible: true
+
+    knows_operator_name:
+      type: boolean
+      initial: false
+      visible: true
+
+    ritual_unlocked:
+      type: boolean
+      initial: false
+      visible: true
+
+    ending_triggered:
+      type: boolean
+      initial: false
+      visible: false
+
+    # Psychological pressure system
+    anxiety:
+      type: number
+      initial: 0
+      visible: true
+
+    # Corruption escalation counter
+    corruption:
+      type: number
+      initial: 0
+      visible: true
+
+    # Trust variable affecting dialogue paths
+    operator_trust:
+      type: number
+      initial: 0
+      visible: true
+
+    # Location awareness
+    in_switchboard_room:
+      type: boolean
+      initial: true
+      visible: true
+
+    in_basement:
+      type: boolean
+      initial: false
+      visible: true

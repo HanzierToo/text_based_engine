@@ -1,0 +1,102 @@
+scene:
+  id: basement_chamber
+
+  nodes:
+
+    - id: chamber
+      text:
+        - key: midnight.basement.chamber_intro
+        - key: midnight.basement.chamber_description
+        - key: midnight.basement.corruption_display
+        - if:
+            gt:
+              var: corruption
+              value: 2
+          then:
+            key: midnight.basement.symbols_pulse
+      choices:
+
+        - id: prepare_ritual
+          text: midnight.choice.prepare_ritual
+          if:
+            all:
+              - has_item:
+                  id: ritual_diagram
+              - has_item:
+                  id: black_candle
+          goto:
+            scene: basement_chamber
+            node: ritual_ready
+
+        - id: search_room
+          text: midnight.choice.search_room
+          if:
+            not:
+              has_item:
+                id: black_candle
+          effects:
+            - add_item:
+                id: black_candle
+            - add:
+                var: anxiety
+                value: 1
+          goto:
+            scene: basement_chamber
+            node: chamber
+
+        - id: retreat
+          text: midnight.choice.retreat
+          goto:
+            scene: basement_stairs
+            node: stairs
+
+
+    - id: ritual_ready
+      text:
+        - key: midnight.basement.ritual_ready
+        - if:
+            eq:
+              var: ritual_unlocked
+              value: true
+          then:
+            key: midnight.basement.pattern_memory
+      choices:
+
+        - id: ignite_candle
+          text: midnight.choice.ignite_candle
+          effects:
+            - add:
+                var: corruption
+                value: 2
+          goto:
+            scene: basement_chamber
+            node: ritual_complete
+
+        - id: abort_ritual
+          text: midnight.choice.abort_ritual
+          effects:
+            - add:
+                var: anxiety
+                value: 1
+          goto:
+            scene: basement_chamber
+            node: chamber
+
+
+    - id: ritual_complete
+      text:
+        - key: midnight.basement.ritual_complete
+        - key: midnight.basement.corruption_surge
+        - if:
+            gte:
+              var: corruption
+              value: 4
+          then:
+            key: midnight.basement.air_tears
+      choices:
+
+        - id: face_consequence
+          text: midnight.choice.face_consequence
+          goto:
+            scene: ending
+            node: ritual_outcome

@@ -1,0 +1,112 @@
+scene:
+  id: ending
+
+  nodes:
+
+    - id: ritual_outcome
+      text:
+        - key: midnight.ending.ritual_outcome
+        - key: midnight.ending.corruption_level
+        - if:
+            gte:
+              var: corruption
+              value: 4
+          then:
+            key: midnight.ending.veil_split
+      effects:
+        - set:
+            var: ending_triggered
+            value: true
+      choices:
+
+        - id: ritual_good
+          text: midnight.choice.continue
+          if:
+            lt:
+              var: corruption
+              value: 4
+          goto:
+            scene: ending
+            node: sealed
+
+        - id: ritual_bad
+          text: midnight.choice.continue
+          if:
+            gte:
+              var: corruption
+              value: 4
+          goto:
+            scene: ending
+            node: consumed
+
+
+    - id: reconciliation
+      text:
+        - key: midnight.ending.reconciliation
+      effects:
+        - set:
+            var: ending_triggered
+            value: true
+      choices:
+        - id: end_reconciliation
+          text: midnight.choice.finish
+          goto:
+            scene: ending
+            node: closed
+
+
+    - id: collapse
+      text:
+        - key: midnight.ending.collapse
+      effects:
+        - set:
+            var: ending_triggered
+            value: true
+      choices:
+        - id: end_collapse
+          text: midnight.choice.finish
+          goto:
+            scene: ending
+            node: consumed
+
+
+    - id: revelation_outcome
+      text:
+        - key: midnight.ending.revelation
+        - if:
+            gt:
+              var: corruption
+              value: 3
+          then:
+            key: midnight.ending.never_alone
+      effects:
+        - set:
+            var: ending_triggered
+            value: true
+      choices:
+        - id: end_revelation
+          text: midnight.choice.finish
+          goto:
+            scene: ending
+            node: open
+
+
+    - id: sealed
+      text:
+        - key: midnight.ending.sealed
+      choices: []
+
+    - id: consumed
+      text:
+        - key: midnight.ending.consumed
+      choices: []
+
+    - id: closed
+      text:
+        - key: midnight.ending.closed
+      choices: []
+
+    - id: open
+      text:
+        - key: midnight.ending.open
+      choices: []

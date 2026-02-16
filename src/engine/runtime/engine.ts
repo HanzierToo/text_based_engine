@@ -141,13 +141,21 @@ export class Engine {
       )
     }
 
+    console.groupCollapsed(`[Engine] choose("${choiceId}")`);
+    console.log("From:", from);
+    console.log("Choice:", choice);
+    console.log("State before:", this.session.getVisibleState());
+
     this.plugins.runHook('beforeChoice', this.session, this.model)
 
     if (choice.if && !evaluateCondition(choice.if, this.session, this.model, this.plugins)) {
+      console.warn("Choice condition failed at runtime:", choice.if);
+      console.log("State at failure:", this.session.getVisibleState());
+      console.groupEnd();
       throw new EngineError(
         'E_RUNTIME_ILLEGAL_CHOICE',
         `Choice "${choiceId}" is not currently available`
-      )
+      );
     }
 
     const to: NodeRef = {
@@ -157,12 +165,30 @@ export class Engine {
 
     this.assertNodeExists(to)
 
-    this.plugins.runHook('beforeTransition', this.session, this.model)
-    applyEffects(choice.effects, this.session, this.model, this.plugins)
-    this.session.move(to, choiceId, from)
-    this.plugins.runHook('afterTransition', this.session, this.model)
-    this.plugins.runHook('afterChoice', this.session, this.model)
-    return this.getViewModel()
+    try {
+      this.plugins.runHook('beforeTransition', this.session, this.model);
+
+      console.log("Applying effects:", choice.effects ?? []);
+      applyEffects(choice.effects, this.session, this.model, this.plugins);
+      console.log("State after effects:", this.session.getVisibleState());
+
+      this.session.move(to, choiceId, from);
+      console.log("Moved to:", this.session.at);
+
+      this.plugins.runHook('afterTransition', this.session, this.model);
+      this.plugins.runHook('afterChoice', this.session, this.model);
+
+      const vm = this.getViewModel();
+      console.log("VM:", { sceneId: vm.sceneId, nodeId: vm.nodeId, choices: vm.choices.map(c => c.id) });
+      console.groupEnd();
+      return vm;
+    } catch (e) {
+      console.error("[Engine] choose crashed:", e);
+      console.log("State at crash:", this.session.getVisibleState());
+      console.log("At crash nodeRef:", this.session.at);
+      console.groupEnd();
+      throw e;
+    }
   }
 
   save(): SaveDataV0 {

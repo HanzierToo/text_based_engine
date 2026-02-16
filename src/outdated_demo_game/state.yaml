@@ -1,6 +1,0 @@
-state:
-  variables:
-    has_key:
-      type: boolean
-      initial: false
-      visible: true

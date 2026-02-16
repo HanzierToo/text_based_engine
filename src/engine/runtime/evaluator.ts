@@ -23,12 +23,12 @@ export function evaluateCondition(
 }
 
 /* ============================================================
- * OPERATOR CONDITIONS
+ * OPERATOR CONDITIONS (Plugin-Driven)
  * ============================================================
  */
 
 function evaluateOperator(
-  condition: any,
+  condition: Record<string, any>,
   session: GameSession,
   model: NormalizedGameModel,
   plugins: PluginRegistry
@@ -54,7 +54,16 @@ function evaluateOperator(
     )
   }
 
-  return handler(payload, session, model)
+  try {
+    return handler(payload, session, model)
+  } catch (err) {
+    if (err instanceof EngineError) throw err
+
+    throw new EngineError(
+      'E_CONDITION_INVALID',
+      `Condition operator "${operator}" threw an error`
+    )
+  }
 }
 
 /* ============================================================
@@ -69,12 +78,26 @@ function evaluateLogical(
   plugins: PluginRegistry
 ): boolean {
   if (cond.all) {
+    if (!Array.isArray(cond.all) || cond.all.length === 0) {
+      throw new EngineError(
+        'E_CONDITION_INVALID',
+        '"all" must be a non-empty array'
+      )
+    }
+
     return cond.all.every(c =>
       evaluateCondition(c, session, model, plugins)
     )
   }
 
   if (cond.any) {
+    if (!Array.isArray(cond.any) || cond.any.length === 0) {
+      throw new EngineError(
+        'E_CONDITION_INVALID',
+        '"any" must be a non-empty array'
+      )
+    }
+
     return cond.any.some(c =>
       evaluateCondition(c, session, model, plugins)
     )
@@ -91,5 +114,8 @@ function evaluateLogical(
 }
 
 function isLogicalCondition(c: Condition): c is LogicalCondition {
-  return 'all' in c || 'any' in c || 'not' in c
+  return (
+    typeof c === 'object' &&
+    (('all' in c) || ('any' in c) || ('not' in c))
+  )
 }

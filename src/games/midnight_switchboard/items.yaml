@@ -1,0 +1,25 @@
+items:
+
+  brass_token:
+    name: midnight.item.brass_token.name
+    description: midnight.item.brass_token.description
+
+  operator_badge:
+    name: midnight.item.operator_badge.name
+    description: midnight.item.operator_badge.description
+
+  torn_photograph:
+    name: midnight.item.torn_photograph.name
+    description: midnight.item.torn_photograph.description
+
+  ritual_diagram:
+    name: midnight.item.ritual_diagram.name
+    description: midnight.item.ritual_diagram.description
+
+  basement_key:
+    name: midnight.item.basement_key.name
+    description: midnight.item.basement_key.description
+
+  black_candle:
+    name: midnight.item.black_candle.name
+    description: midnight.item.black_candle.description

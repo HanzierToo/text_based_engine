@@ -19,7 +19,7 @@ export function validateGameData(data: ParsedGameData): void {
 }
 
 /* ============================================================
- * Condition Validation (Operator-Based)
+ * Condition Validation (Operator-Based + Plugin-Compatible)
  * ============================================================
  */
 
@@ -34,19 +34,21 @@ function validateCondition(condition: Condition, path: string): void {
   }
 
   const operator = keys[0]
+  const payload = (condition as any)[operator]
 
+  // ------------------------------------------------------------
   // Logical operators
-  if (operator === 'all' || operator === 'any') {
-    const arr = (condition as any)[operator]
+  // ------------------------------------------------------------
 
-    if (!Array.isArray(arr) || arr.length === 0) {
+  if (operator === 'all' || operator === 'any') {
+    if (!Array.isArray(payload) || payload.length === 0) {
       throw new EngineError(
         'E_CONDITION_INVALID',
         `"${operator}" must be a non-empty array at ${path}`
       )
     }
 
-    arr.forEach((c: Condition, i: number) =>
+    payload.forEach((c: Condition, i: number) =>
       validateCondition(c, `${path}.${operator}[${i}]`)
     )
 
@@ -54,34 +56,66 @@ function validateCondition(condition: Condition, path: string): void {
   }
 
   if (operator === 'not') {
-    const inner = (condition as any).not
-
-    if (!inner) {
+    if (!payload) {
       throw new EngineError(
         'E_CONDITION_INVALID',
         `"not" condition missing value at ${path}`
       )
     }
 
-    validateCondition(inner, `${path}.not`)
+    validateCondition(payload, `${path}.not`)
     return
   }
 
-  // Primitive/operator-based condition
-  const payload = (condition as any)[operator]
+  // ------------------------------------------------------------
+  // Core primitive operators
+  // ------------------------------------------------------------
 
   if (
-    typeof payload !== 'object' ||
-    payload === null ||
-    !payload.var ||
-    !('value' in payload)
+    operator === 'eq' ||
+    operator === 'neq' ||
+    operator === 'gt' ||
+    operator === 'gte' ||
+    operator === 'lt' ||
+    operator === 'lte'
   ) {
+    if (
+      typeof payload !== 'object' ||
+      payload === null ||
+      typeof payload.var !== 'string' ||
+      !('value' in payload)
+    ) {
+      throw new EngineError(
+        'E_CONDITION_INVALID',
+        `Invalid payload for operator "${operator}" at ${path}`
+      )
+    }
+
+    return
+  }
+
+  // ------------------------------------------------------------
+  // Plugin-style operators (e.g. has_item)
+  // ------------------------------------------------------------
+  // At schema level we only require:
+  // - payload is object
+  // Further validation happens at runtime via plugin
+  // ------------------------------------------------------------
+
+  if (typeof payload !== 'object' || payload === null) {
     throw new EngineError(
       'E_CONDITION_INVALID',
       `Invalid payload for operator "${operator}" at ${path}`
     )
   }
+
+  // Allow plugin condition to pass schema validation
 }
+
+/* ============================================================
+ * Effects
+ * ============================================================
+ */
 
 function validateEffects(
   effects: Effect[] | undefined,
@@ -234,9 +268,8 @@ function validateItems(data: ParsedGameData): void {
   }
 }
 
-
 /* ============================================================
- * Scenes and Nodes
+ * Scenes
  * ============================================================
  */
 
@@ -259,7 +292,11 @@ function validateScenes(data: ParsedGameData): void {
   }
 }
 
-function validateNodes(sceneDef: SceneDefinition, filename: string, data: ParsedGameData): void {
+function validateNodes(
+  sceneDef: SceneDefinition,
+  filename: string,
+  data: ParsedGameData
+): void {
   const nodeIds = new Set<string>()
 
   for (const node of sceneDef.scene.nodes) {
@@ -289,7 +326,7 @@ function validateChoices(
   node: NodeDefinition,
   sceneId: string,
   filename: string,
-  data: ParsedGameData,
+  data: ParsedGameData
 ): void {
   for (const choice of node.choices) {
     if (!choice.goto) {
@@ -299,17 +336,19 @@ function validateChoices(
         { file: `scenes/${filename}`, path: `node.${node.id}.choices.${choice.id}` }
       )
     }
+
     if (choice.if) {
       validateCondition(
         choice.if,
         `scene.${sceneId}.node.${node.id}.choice.${choice.id}.if`
       )
     }
-      validateEffects(
-        choice.effects,
-        `scene.${sceneId}.node.${node.id}.choice.${choice.id}.effects`,
-        data
-      )
+
+    validateEffects(
+      choice.effects,
+      `scene.${sceneId}.node.${node.id}.choice.${choice.id}.effects`,
+      data
+    )
   }
 }
 
@@ -341,5 +380,4 @@ function validateStartNode(data: ParsedGameData): void {
       { file: 'game.yaml', path: 'game.start.node' }
     )
   }
-
 }

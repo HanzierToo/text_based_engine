@@ -1,0 +1,194 @@
+midnight:
+
+  prologue:
+    desk_intro: "The switchboard office is dimly lit. Only one desk lamp burns."
+    call_active: "You lift the receiver. Static crackles across the line, interruped only by the sound of slow, deliberate breathing."
+    call_rings_again: "The telephone continues ringing. It refuses to be ignored."
+    clock: "The clock reads 00:17."
+    anxiety_status: "Your anxiety level is {{anxiety}}."
+    line_open: "The line is already open. Someone is breathing softly."
+
+    lift_receiver: "Your fingers hover over the receiver."
+    receiver_warm: "It already feels faintly warm."
+    ringing_stops: "The ringing stops the instant you lift it."
+
+    breathing_stops: "The breathing stops."
+    feel_watched: "You feel watched."
+    memory_echo: "For a moment, you remember answering this call before."
+
+    trace_attempt: "You attempt to trace the origin."
+    board_flicker: "The switchboard lights flicker."
+    signal_internal: "The signal appears to originate from somewhere inside this building."
+
+    ringing_louder: "The ringing is louder now."
+    anxiety_display: "Anxiety: {{anxiety}}"
+    ringing_drill: "The sound drills into your skull."
+
+  switchboard:
+    main_intro: "The switchboard stretches across the wall. Wires hang like veins."
+    desk: "The desk is cluttered with invoices and old cigarette ash."
+    panel: "The control panel hums faintly beneath your fingertips."
+    cabinet: "A narrow filing cabinet stands half open."
+
+    status_line: "Anxiety: {{anxiety}} | Corruption: {{corruption}}"
+    light_flicker: "The overhead light flickers intermittently."
+    cable_sway: "One of the unplugged cables sways gently. There is no draft."
+    board_familiar: "The board feels almost familiar beneath your hands."
+
+    listen_still: "You stand perfectly still."
+    listen_normal: "Only the faint hum of electricity answers you."
+    listen_other: "Something else hums beneath it. Slow. Patient."
+
+    token_visible: "A small brass token lies near the blotter."
+
+    drawer_open: "The drawer resists before sliding open."
+    badge_present: "An old operator badge rests inside."
+    badge_indent: "The empty indentation suggests it belonged there for years."
+
+    faded_initial: "One switch is labeled only with a faded initial: M."
+    badge_match: "The insignia on the badge matches a scratched symbol near the lower switches."
+
+    photo_visible: "A torn photograph is tucked inside a folder."
+    photo_shift: "The photograph seems slightly different each time you glance at it."
+
+  records:
+    archive_intro: "Rows of old folders line the archive room."
+    files: "Most files are mundane. A few are sealed with red wax."
+    diagram_reaction: "The diagram seems older than the paper it rests on."
+
+    dust_air: "Dust hangs in the air like suspended breath."
+    drawers_ajar: "The filing drawers seem slightly ajar, though you do not remember opening them."
+
+    diagram_visible: "Among the folders is a brittle sheet covered in geometric inkwork."
+
+    corruption_display: "Corruption: {{corruption}}"
+    whisper_floor: "You briefly hear whispering beneath the floorboards."
+
+  basement:
+    stairs_intro: "The staircase descends into darkness."
+    chamber_intro: "The basement chamber smells of wax and stone."
+    ritual_ready: "You kneel at the center of the circle."
+    ritual_complete: "The candle burns unnaturally steady."
+
+    status_line: "Anxiety: {{anxiety}} | Corruption: {{corruption}}"
+    hands_tremble: "Your hands tremble as you grip the railing."
+    shift_below: "Something shifts below. Not footsteps. Something heavier."
+
+    chamber_description: "The chamber is circular. Symbols are carved into the stone."
+    corruption_display: "Corruption: {{corruption}}"
+    symbols_pulse: "The symbols faintly pulse."
+
+    pattern_memory: "You replicate the pattern from memory."
+
+    corruption_surge: "Corruption surges to {{corruption}}."
+    air_tears: "The air tears open."
+
+  operator:
+    line_active: "The operator's voice emerges through static."
+    trust_shift: "There is recognition in the silence."
+    tension: "The conversation tightens like a wire pulled too far."
+    revelation: "The truth filters through distortion."
+
+    status_line: "Anxiety: {{anxiety}} | Trust: {{operator_trust}} | Corruption: {{corruption}}"
+    layered_voice: "The voice sounds layered, as if two people speak in unison."
+
+    voice_softens: "The voice softens. \"You finally remember.\""
+
+    receiver_hot: "The receiver feels hot against your ear."
+
+    truth_inhuman: "The truth is no longer human."
+
+  ending:
+    ritual_outcome: "The ritual concludes."
+    reconciliation: "The voice thanks you. The line goes silent."
+    collapse: "The connection overloads. Reality flickers."
+    revelation: "The truth settles heavily in the air."
+    sealed: "The chamber grows quiet. The veil remains intact."
+    consumed: "Darkness folds inward. The line never disconnects."
+    closed: "The office is empty. Morning light filters in."
+    open: "The switchboard hums. Something remains connected."
+
+    corruption_level: "Corruption level: {{corruption}}"
+    veil_split: "The veil splits completely."
+    never_alone: "You were never alone in the room."
+
+  choice:
+    answer_call: "Answer the ringing phone"
+    answer_after_delay: "Finally answer the ringing phone"
+    ignore_call: "Ignore the ringing"
+    leave_desk: "Leave the desk"
+
+    speak: "Speak into the receiver"
+    hang_up: "Hang up"
+
+    trace_call: "Attempt to trace the call"
+    listen_room: "Stand still and listen"
+    open_drawer: "Open the desk drawer"
+    take_badge: "Take the operator badge"
+
+    inspect_desk: "Inspect the desk"
+    inspect_panel: "Examine the control panel"
+    inspect_cabinet: "Open the filing cabinet"
+    go_records: "Enter the records room"
+    open_operator_line: "Open a direct operator line"
+    descend_basement: "Descend to the basement"
+    back: "Return"
+
+    take_token: "Take the brass token"
+    study_label: "Study the faded label"
+    take_photo: "Take the torn photograph"
+    search_deeper: "Search deeper inside"
+
+    search_files: "Search through the files"
+    return_switchboard: "Return to the switchboard"
+    take_diagram: "Take the ritual diagram"
+    disturb_stack: "Disturb the stack of folders"
+    steady_self: "Steady yourself"
+
+    descend_fully: "Descend fully"
+    hesitate: "Hesitate on the stairs"
+    retreat: "Retreat upstairs"
+
+    prepare_ritual: "Prepare the ritual"
+    search_room: "Search the chamber"
+    ignite_candle: "Ignite the black candle"
+    abort_ritual: "Abort the ritual"
+    face_consequence: "Face the consequence"
+
+    speak_name: "Speak the operator's name"
+    accuse: "Accuse the voice"
+    listen_silently: "Listen silently"
+    accept_truth: "Accept the truth"
+    doubt_again: "Express doubt"
+    escalate: "Escalate the confrontation"
+    withdraw: "Withdraw from the line"
+    pursue_truth: "Pursue the truth"
+    disconnect: "Disconnect the line"
+
+    continue: "Continue"
+    finish: "Finish"
+
+  item:
+    brass_token:
+      name: "Brass Token"
+      description: "A heavy brass token engraved with an unfamiliar symbol."
+
+    operator_badge:
+      name: "Operator Badge"
+      description: "A tarnished badge bearing the switchboard insignia."
+
+    torn_photograph:
+      name: "Torn Photograph"
+      description: "A half-burned photograph of two figures near the switchboard."
+
+    ritual_diagram:
+      name: "Ritual Diagram"
+      description: "A geometric pattern drawn in fading ink."
+
+    basement_key:
+      name: "Basement Key"
+      description: "A cold iron key labeled only with a scratched B."
+
+    black_candle:
+      name: "Black Candle"
+      description: "A thick candle that absorbs more light than it reflects."

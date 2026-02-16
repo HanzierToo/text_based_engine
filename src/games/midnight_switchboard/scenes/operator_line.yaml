@@ -1,0 +1,140 @@
+scene:
+  id: operator_line
+
+  nodes:
+
+    - id: line_active
+      text:
+        - key: midnight.operator.line_active
+        - key: midnight.operator.status_line
+        - if:
+            gt:
+              var: corruption
+              value: 2
+          then:
+            key: midnight.operator.layered_voice
+      choices:
+
+        - id: speak_name
+          text: midnight.choice.speak_name
+          if:
+            eq:
+              var: knows_operator_name
+              value: true
+          effects:
+            - add:
+                var: operator_trust
+                value: 1
+          goto:
+            scene: operator_line
+            node: trust_shift
+
+        - id: accuse
+          text: midnight.choice.accuse
+          effects:
+            - add:
+                var: anxiety
+                value: 1
+            - add:
+                var: operator_trust
+                value: -1
+          goto:
+            scene: operator_line
+            node: tension
+
+        - id: listen_silently
+          text: midnight.choice.listen_silently
+          effects:
+            - add:
+                var: corruption
+                value:
+                  random: "1/2"
+          goto:
+            scene: operator_line
+            node: revelation
+
+        - id: hang_up_line
+          text: midnight.choice.hang_up
+          goto:
+            scene: switchboard_room
+            node: main
+
+
+    - id: trust_shift
+      text:
+        - key: midnight.operator.trust_shift
+        - if:
+            gte:
+              var: operator_trust
+              value: 2
+          then:
+            key: midnight.operator.voice_softens
+      choices:
+
+        - id: accept_truth
+          text: midnight.choice.accept_truth
+          if:
+            gte:
+              var: operator_trust
+              value: 2
+          goto:
+            scene: ending
+            node: reconciliation
+
+        - id: doubt_again
+          text: midnight.choice.doubt_again
+          goto:
+            scene: operator_line
+            node: tension
+
+
+    - id: tension
+      text:
+        - key: midnight.operator.tension
+        - if:
+            gt:
+              var: anxiety
+              value: 3
+          then:
+            key: midnight.operator.receiver_hot
+      choices:
+
+        - id: escalate
+          text: midnight.choice.escalate
+          effects:
+            - add:
+                var: corruption
+                value: 1
+          goto:
+            scene: ending
+            node: collapse
+
+        - id: withdraw
+          text: midnight.choice.withdraw
+          goto:
+            scene: switchboard_room
+            node: main
+
+
+    - id: revelation
+      text:
+        - key: midnight.operator.revelation
+        - if:
+            gt:
+              var: corruption
+              value: 3
+          then:
+            key: midnight.operator.truth_inhuman
+      choices:
+
+        - id: pursue_truth
+          text: midnight.choice.pursue_truth
+          goto:
+            scene: ending
+            node: revelation_outcome
+
+        - id: disconnect
+          text: midnight.choice.disconnect
+          goto:
+            scene: switchboard_room
+            node: main

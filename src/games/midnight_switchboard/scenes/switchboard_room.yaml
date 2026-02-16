@@ -1,0 +1,267 @@
+scene:
+  id: switchboard_room
+
+  nodes:
+
+    - id: main
+      text:
+        - key: midnight.switchboard.main_intro
+        - key: midnight.switchboard.status_line
+        - if:
+            gt:
+              var: anxiety
+              value: 2
+          then:
+            key: midnight.switchboard.light_flicker
+        - if:
+            gte:
+              var: corruption
+              value: 2
+          then:
+            key: midnight.switchboard.cable_sway
+        - if:
+            gte:
+              var: operator_trust
+              value: 2
+          then:
+            key: midnight.switchboard.board_familiar
+      choices:
+        - id: inspect_desk
+          text: midnight.choice.inspect_desk
+          goto:
+            scene: switchboard_room
+            node: desk
+
+        - id: inspect_panel
+          text: midnight.choice.inspect_panel
+          goto:
+            scene: switchboard_room
+            node: panel
+
+        - id: inspect_cabinet
+          text: midnight.choice.inspect_cabinet
+          goto:
+            scene: switchboard_room
+            node: cabinet
+
+        - id: listen_room
+          text: midnight.choice.listen_room
+          goto:
+            scene: switchboard_room
+            node: ambience
+
+        - id: go_records
+          text: midnight.choice.go_records
+          goto:
+            scene: records_room
+            node: archive
+
+        - id: go_operator_line
+          text: midnight.choice.open_operator_line
+          if:
+            gt:
+              var: operator_trust
+              value: 0
+          goto:
+            scene: operator_line
+            node: line_active
+
+        - id: go_basement
+          text: midnight.choice.descend_basement
+          if:
+            has_item:
+              id: basement_key
+          goto:
+            scene: basement_stairs
+            node: stairs
+
+
+    - id: ambience
+      text:
+        - key: midnight.switchboard.listen_still
+        - if:
+            lt:
+              var: corruption
+              value: 2
+          then:
+            key: midnight.switchboard.listen_normal
+        - if:
+            gte:
+              var: corruption
+              value: 2
+          then:
+            key: midnight.switchboard.listen_other
+      choices:
+        - id: return_from_listen
+          text: midnight.choice.back
+          goto:
+            scene: switchboard_room
+            node: main
+
+
+    - id: desk
+      text:
+        - key: midnight.switchboard.desk
+        - if:
+            not:
+              has_item:
+                id: brass_token
+          then:
+            key: midnight.switchboard.token_visible
+      choices:
+        - id: take_token
+          text: midnight.choice.take_token
+          if:
+            not:
+              has_item:
+                id: brass_token
+          effects:
+            - add_item:
+                id: brass_token
+          goto:
+            scene: switchboard_room
+            node: desk
+
+        - id: open_drawer
+          text: midnight.choice.open_drawer
+          goto:
+            scene: switchboard_room
+            node: drawer
+
+        - id: back_main
+          text: midnight.choice.back
+          goto:
+            scene: switchboard_room
+            node: main
+
+
+    - id: drawer
+      text:
+        - key: midnight.switchboard.drawer_open
+        - if:
+            not:
+              has_item:
+                id: operator_badge
+          then:
+            key: midnight.switchboard.badge_present
+        - if:
+            has_item:
+              id: operator_badge
+          then:
+            key: midnight.switchboard.badge_indent
+      choices:
+        - id: take_badge
+          text: midnight.choice.take_badge
+          if:
+            not:
+              has_item:
+                id: operator_badge
+          effects:
+            - add_item:
+                id: operator_badge
+            - add:
+                var: operator_trust
+                value: 1
+          goto:
+            scene: switchboard_room
+            node: drawer
+
+        - id: close_drawer
+          text: midnight.choice.back
+          goto:
+            scene: switchboard_room
+            node: desk
+
+
+    - id: panel
+      text:
+        - key: midnight.switchboard.panel
+        - if:
+            eq:
+              var: knows_operator_name
+              value: false
+          then:
+            key: midnight.switchboard.faded_initial
+        - if:
+            has_item:
+              id: operator_badge
+          then:
+            key: midnight.switchboard.badge_match
+      choices:
+        - id: study_label
+          text: midnight.choice.study_label
+          if:
+            eq:
+              var: knows_operator_name
+              value: false
+          effects:
+            - set:
+                var: knows_operator_name
+                value: true
+            - add:
+                var: operator_trust
+                value: 1
+          goto:
+            scene: switchboard_room
+            node: panel
+
+        - id: back_main_panel
+          text: midnight.choice.back
+          goto:
+            scene: switchboard_room
+            node: main
+
+
+    - id: cabinet
+      text:
+        - key: midnight.switchboard.cabinet
+        - if:
+            not:
+              has_item:
+                id: torn_photograph
+          then:
+            key: midnight.switchboard.photo_visible
+        - if:
+            gte:
+              var: corruption
+              value: 1
+          then:
+            key: midnight.switchboard.photo_shift
+      choices:
+        - id: take_photo
+          text: midnight.choice.take_photo
+          if:
+            not:
+              has_item:
+                id: torn_photograph
+          effects:
+            - add_item:
+                id: torn_photograph
+            - add:
+                var: anxiety
+                value: 1
+          goto:
+            scene: switchboard_room
+            node: cabinet
+
+        - id: find_key
+          text: midnight.choice.search_deeper
+          if:
+            all:
+              - has_item:
+                  id: torn_photograph
+              - not:
+                  has_item:
+                    id: basement_key
+          effects:
+            - add_item:
+                id: basement_key
+          goto:
+            scene: switchboard_room
+            node: cabinet
+
+        - id: back_main_cabinet
+          text: midnight.choice.back
+          goto:
+            scene: switchboard_room
+            node: main

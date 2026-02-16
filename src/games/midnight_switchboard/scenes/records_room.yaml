@@ -1,0 +1,105 @@
+scene:
+  id: records_room
+
+  nodes:
+
+    - id: archive
+      text:
+        - key: midnight.records.archive_intro
+        - key: midnight.records.dust_air
+        - if:
+            gt:
+              var: corruption
+              value: 1
+          then:
+            key: midnight.records.drawers_ajar
+      choices:
+
+        - id: search_files
+          text: midnight.choice.search_files
+          goto:
+            scene: records_room
+            node: files
+
+        - id: return_switchboard
+          text: midnight.choice.return_switchboard
+          goto:
+            scene: switchboard_room
+            node: main
+
+
+    - id: files
+      text:
+        - key: midnight.records.files
+        - if:
+            not:
+              has_item:
+                id: ritual_diagram
+          then:
+            key: midnight.records.diagram_visible
+      choices:
+
+        - id: take_diagram
+          text: midnight.choice.take_diagram
+          if:
+            not:
+              has_item:
+                id: ritual_diagram
+          effects:
+            - add_item:
+                id: ritual_diagram
+            - set:
+                var: ritual_unlocked
+                value: true
+            - add:
+                var: corruption
+                value: 1
+          goto:
+            scene: records_room
+            node: diagram_reaction
+
+        - id: disturb_stack
+          text: midnight.choice.disturb_stack
+          effects:
+            - add:
+                var: anxiety
+                value:
+                  random: "1/2"
+          goto:
+            scene: records_room
+            node: archive
+
+        - id: back_archive
+          text: midnight.choice.back
+          goto:
+            scene: records_room
+            node: archive
+
+
+    - id: diagram_reaction
+      text:
+        - key: midnight.records.diagram_reaction
+        - key: midnight.records.corruption_display
+        - if:
+            gte:
+              var: corruption
+              value: 2
+          then:
+            key: midnight.records.whisper_floor
+      choices:
+
+        - id: steady_self
+          text: midnight.choice.steady_self
+          effects:
+            - add:
+                var: anxiety
+                value: -1
+          goto:
+            scene: records_room
+            node: archive
+
+        - id: return_with_diagram
+          text: midnight.choice.return_switchboard
+          goto:
+            scene: switchboard_room
+            node: main

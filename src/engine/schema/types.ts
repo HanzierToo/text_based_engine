@@ -18,7 +18,7 @@ export interface GameManifest {
 
     ui: {
       theme: string
-      text_speed: 'slow' | 'normal' | 'fast'
+      text_speed: 'slow' | 'normal' | 'fast' | 'instant' | number
     }
 
     localization?: {
@@ -133,6 +133,7 @@ export interface ChoiceDefinition {
 export type Condition =
   | PrimitiveCondition
   | LogicalCondition
+  | OperatorCondition
 
 export interface PrimitiveCondition {
   var: string
@@ -148,6 +149,10 @@ export interface LogicalCondition {
   all?: Condition[]
   any?: Condition[]
   not?: Condition
+}
+
+export interface OperatorCondition {
+  [operator: string]: unknown
 }
 
 /* ============================================================
@@ -187,7 +192,7 @@ export interface RandomValue {
  * ============================================================
  */
 
-export type LocalizationBundle = Record<string, Record<string, string>>
+export type LocalizationBundle = Record<string, any>
 
 /* ============================================================
  * Engine-Level Aggregates (Parsed but Unvalidated)

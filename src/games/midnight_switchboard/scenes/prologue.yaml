@@ -1,0 +1,168 @@
+scene:
+  id: prologue
+
+  nodes:
+
+    - id: desk
+      text:
+        - key: midnight.prologue.desk_intro
+        - key: midnight.prologue.clock
+        - key: midnight.prologue.anxiety_status
+        - if:
+            eq:
+              var: call_answered
+              value: true
+          then:
+            key: midnight.prologue.line_open
+      choices:
+        - id: answer_call
+          text: midnight.choice.answer_call
+          if:
+            eq:
+              var: call_answered
+              value: false
+          effects:
+            - set:
+                var: call_answered
+                value: true
+            - add:
+                var: anxiety
+                value:
+                  random: "1/2"
+          goto:
+            scene: prologue
+            node: lift_receiver
+
+        - id: ignore_call
+          text: midnight.choice.ignore_call
+          if:
+            eq:
+              var: call_answered
+              value: false
+          effects:
+            - add:
+                var: anxiety
+                value: 1
+          goto:
+            scene: prologue
+            node: call_rings_again
+
+        - id: proceed_room
+          text: midnight.choice.leave_desk
+          if:
+            eq:
+              var: call_answered
+              value: true
+          goto:
+            scene: switchboard_room
+            node: main
+
+
+    - id: lift_receiver
+      text:
+        - key: midnight.prologue.lift_receiver
+        - if:
+            gte:
+              var: anxiety
+              value: 1
+          then:
+            key: midnight.prologue.receiver_warm
+        - key: midnight.prologue.ringing_stops
+      choices:
+        - id: continue_answer
+          text: midnight.choice.answer_call
+          goto:
+            scene: prologue
+            node: call_active
+
+
+    - id: call_active
+      text:
+        - key: midnight.prologue.call_active
+        - key: midnight.prologue.breathing_stops
+        - if:
+            gte:
+              var: anxiety
+              value: 1
+          then:
+            key: midnight.prologue.feel_watched
+        - if:
+            gte:
+              var: corruption
+              value: 1
+          then:
+            key: midnight.prologue.memory_echo
+      choices:
+        - id: speak
+          text: midnight.choice.speak
+          effects:
+            - add:
+                var: operator_trust
+                value: 1
+          goto:
+            scene: switchboard_room
+            node: main
+
+        - id: hang_up
+          text: midnight.choice.hang_up
+          effects:
+            - add:
+                var: anxiety
+                value: 1
+          goto:
+            scene: switchboard_room
+            node: main
+
+        - id: trace_call
+          text: midnight.choice.trace_call
+          effects:
+            - add:
+                var: anxiety
+                value: 1
+          goto:
+            scene: prologue
+            node: static_response
+
+
+    - id: static_response
+      text:
+        - key: midnight.prologue.trace_attempt
+        - key: midnight.prologue.board_flicker
+        - if:
+            gte:
+              var: corruption
+              value: 1
+          then:
+            key: midnight.prologue.signal_internal
+      choices:
+        - id: abandon_trace
+          text: midnight.choice.back
+          goto:
+            scene: prologue
+            node: call_active
+
+
+    - id: call_rings_again
+      text:
+        - key: midnight.prologue.call_rings_again
+        - key: midnight.prologue.ringing_louder
+        - key: midnight.prologue.anxiety_display
+        - if:
+            gte:
+              var: anxiety
+              value: 2
+          then:
+            key: midnight.prologue.ringing_drill
+      choices:
+        - id: answer_after_delay
+          text: midnight.choice.answer_after_delay
+          effects:
+            - set:
+                var: call_answered
+                value: true
+            - add:
+                var: corruption
+                value: 1
+          goto:
+            scene: prologue
+            node: lift_receiver

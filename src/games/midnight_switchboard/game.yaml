@@ -1,0 +1,12 @@
+game:
+  id: midnight_switchboard
+  title: Midnight Switchboard
+  version: "0.1"
+
+  start:
+    scene: prologue
+    node: desk
+
+  ui:
+    theme: default
+    text_speed: normal
