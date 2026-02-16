@@ -9,7 +9,7 @@ Games are defined entirely through `.yaml` files. No JavaScript required to crea
 >
 > That information is inside another `README.md` file within the `game/` sub-directory inside the `src/` repository.
 >
-> If you're not familiar with GitHub, press the `src` folder, then the `game` folder. Otherwise, [open this url](https://github.com/HanzierToo/text_based_engine/tree/main/src/games).
+> If you're not familiar with GitHub, press the `src` folder, then the `game` folder. Otherwise, click [here to browse the game files](./src/games) or [here to find the game-specific README/tutorial](./src/games/README.md).
 
 ---
 
