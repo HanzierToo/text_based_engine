@@ -31,6 +31,7 @@
   let isTyping = false;
   let resolvedTextSpeed = 10; // default fallback
   let instantMode = false;
+  let lastRenderedNodeKey: string | null = null;
 
   const DEV = true;
 
@@ -161,21 +162,34 @@
   }
 
   $: if ($engineStore.viewModel) {
-    const lines = $engineStore.viewModel.text;
+    const vm = $engineStore.viewModel;
+    const nodeKey = `${vm.sceneId}:${vm.nodeId}`;
 
-    // Reset when scene changes
-    displayedLines = [];
-    currentLineIndex = 0;
+    if (nodeKey !== lastRenderedNodeKey) {
+      lastRenderedNodeKey = nodeKey;
 
-    if (lines.length > 0) {
-      displayedLines = [lines[0]];
-      isTyping = true;
+      const lines = vm.text;
+
+      displayedLines = [];
+      currentLineIndex = 0;
+
+      if (lines.length > 0) {
+        displayedLines = [lines[0]];
+        isTyping = !instantMode;
+      } else {
+        isTyping = false;
+      }
     }
   }
 
   function handleLineComplete() {
     const vm = get(engineStore).viewModel;
     if (!vm) return;
+
+    const nodeKey = `${vm.sceneId}:${vm.nodeId}`;
+
+    // Ignore stale completions
+    if (nodeKey !== lastRenderedNodeKey) return;
 
     currentLineIndex++;
 
@@ -286,7 +300,7 @@
         <ul>
           {#each $engineStore.viewModel.inventory as item}
             <li title={item.description}>
-              • {item.name}
+              {item.name}
             </li>
           {/each}
         </ul>
