@@ -264,7 +264,7 @@
     </div>
 
     <div class="content">
-      {#each displayedLines as line, i}
+      {#each displayedLines as line, i (`${lastRenderedNodeKey}-${i}`)}
         <p>
           {#if instantMode}
             <span>{line}</span>
