@@ -1,5 +1,7 @@
 # Game Content Guide (v0.1)
 
+> **NOTICE:** If you're new to game creation, start with [Tutorial.md](./Tutorial.md) for a holistic, step-by-step guide. This document is the technical reference — it covers detailed syntax and requirements.
+
 This directory contains all declarative game content.
 
 The engine reads **only YAML files** from this directory.

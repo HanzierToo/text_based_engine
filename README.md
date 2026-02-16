@@ -7,9 +7,11 @@ Games are defined entirely through `.yaml` files. No JavaScript required to crea
 
 > **NOTICE:** This README does **NOT** contain information on how to make a game or game-specific information.
 >
-> That information is inside another `README.md` file within the `game/` sub-directory inside the `src/` repository.
+> For game creation guidance, see:
 >
-> If you're not familiar with GitHub, press the `src` folder, then the `game` folder. Otherwise, click [here to browse the game files](./src/games) or [here to find the game-specific README/tutorial](./src/games/README.md).
+> - [here](./src/games/Tutorial.md) for a holistic tutorial on creating games.
+> - [here](./src/games) to browse game files.
+> - [here](./src/games/README.md) for the technical game content reference.
 
 ---
 
