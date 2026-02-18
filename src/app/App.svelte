@@ -34,6 +34,7 @@
   let instantMode = false;
   let lastRenderedNodeKey: string | null = null;
   let renderRevision = 0;
+  let lastResolvedText: string[] = [];
 
   const speedModes: Array<GameManifest["game"]["ui"]["text_speed"]> = [
     "slow",
@@ -175,6 +176,8 @@
         vm: { sceneId: newVm.sceneId, nodeId: newVm.nodeId, choices: newVm.choices.map(c => c.id) },
       });
 
+      console.log("NEW VM TEXT:", newVm.text);
+
       engineStore.set({
         engine: state.engine,
         viewModel: newVm,
@@ -194,21 +197,68 @@
   $: if ($engineStore.viewModel) {
     const vm = $engineStore.viewModel;
     const nodeKey = `${vm.sceneId}:${vm.nodeId}`;
+    const newLines = vm.text;
 
-    if (nodeKey !== lastRenderedNodeKey) {
+    const isFirstRender = !lastRenderedNodeKey;
+    const sameNode = nodeKey === lastRenderedNodeKey;
+
+    if (isFirstRender) {
       lastRenderedNodeKey = nodeKey;
+      lastResolvedText = [...newLines];
+      renderRevision++;
+      initializeRender(newLines);
 
-      const lines = vm.text;
+    } else if (!sameNode) {
+      lastRenderedNodeKey = nodeKey;
+      lastResolvedText = [...newLines];
+      renderRevision++;
+      initializeRender(newLines);
 
-      displayedLines = [];
-      currentLineIndex = 0;
+    } else {
+      // Compare against last resolved text, not displayedLines
+      const grew =
+        newLines.length > lastResolvedText.length &&
+        newLines
+          .slice(0, lastResolvedText.length)
+          .every((line, i) => line === lastResolvedText[i]);
 
-      if (lines.length > 0) {
-        displayedLines = [lines[0]];
-        isTyping = !instantMode;
-      } else {
-        isTyping = false;
+      if (grew) {
+        lastResolvedText = [...newLines];
+
+        const additional = newLines.slice(displayedLines.length);
+
+        if (additional.length > 0) {
+          if (instantMode) {
+            displayedLines = [...displayedLines, ...additional];
+            isTyping = false;
+          } else {
+            displayedLines = [...displayedLines, additional[0]];
+            currentLineIndex = displayedLines.length - 1;
+            isTyping = true;
+          }
+        }
+
+      } else if (
+        newLines.length !== lastResolvedText.length ||
+        !newLines.every((line, i) => line === lastResolvedText[i])
+      ) {
+        // Structural rewrite
+        lastResolvedText = [...newLines];
+        renderRevision++;
+        initializeRender(newLines);
       }
+    }
+  }
+
+  function initializeRender(lines: string[]) {
+    currentLineIndex = 0;
+
+    if (instantMode) {
+      displayedLines = [...lines];
+      isTyping = false;
+    } else {
+      displayedLines = lines.length > 0 ? [lines[0]] : [];
+      isTyping = lines.length > 0;
     }
   }
 
