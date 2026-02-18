@@ -21,6 +21,7 @@
     ParsedGameData,
     ItemsFile,
   } from "../engine/schema/types";
+    import Tooltip from "@/ui/components/Tooltip.svelte";
 
   let error: string | null = null;
   let debugVisible = false;
@@ -40,6 +41,7 @@
     "slow",
     "normal",
     "fast",
+    "rapid",
     "instant",
   ];
   let currentSpeedIndex = 1; // default to "normal"
@@ -297,6 +299,9 @@
       case "fast":
         resolvedTextSpeed = 10;
         break;
+      case "rapid":
+        resolvedTextSpeed = 5;
+        break;
       case "instant":
         resolvedTextSpeed = 0;
         instantMode = true;
@@ -412,15 +417,24 @@
       </div>
 
       <div class="inventory">
-        <h3>Inventory</h3>
+        <div class="inventory-header">
+          <h3>Inventory</h3>
+          <Tooltip text="Hover over item names to see their description.">
+            <div class="info-icon">i</div>
+          </Tooltip>
+        </div>
 
         {#if $engineStore.viewModel.inventory.length === 0}
           <p class="muted">(empty)</p>
         {:else}
           <ul>
             {#each $engineStore.viewModel.inventory as item}
-              <li title={item.description}>
-                {item.name}
+              <li>
+                <Tooltip text={item.description}>
+                  <span class="inventory-item">
+                    {item.name}
+                  </span>
+                </Tooltip>
               </li>
             {/each}
           </ul>

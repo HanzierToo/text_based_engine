@@ -18,7 +18,7 @@ export interface GameManifest {
 
     ui: {
       theme: string
-      text_speed: 'slow' | 'normal' | 'fast' | 'instant' | number
+      text_speed: 'slow' | 'normal' | 'fast' | 'rapid' | 'instant' | number
     }
 
     localization?: {
