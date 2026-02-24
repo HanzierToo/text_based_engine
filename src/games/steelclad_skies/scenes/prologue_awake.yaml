@@ -1,0 +1,348 @@
+scene:
+  id: prologue_awake
+
+  nodes:
+
+    ##########################################
+    ### PROLOGUE SCENE 1 | AWAKE - BEDROOM ###
+    ##########################################
+
+    - id: awake
+
+      text: 
+        - key: prologue.awake.intro
+        - key: prologue.awake.notice_board
+        - key: prologue.awake.make_ready
+        - if:
+            eq:
+              var: looked_around
+              value: true
+          then:
+            key: prologue.awake.look_around
+        - if:
+            eq:
+              var: took_stuff
+              value: true
+          then:
+            key: prologue.awake.take_stuff
+      
+      choices:
+        - id: look_around
+          text: prologue.choice.look_around
+          if:
+            eq:
+              var: looked_around
+              value: false
+          effects:
+            - set:
+                var: looked_around
+                value: true
+          goto:
+            scene: prologue_awake
+            node: awake
+
+        - id: take_stuff
+          text: prologue.choice.take_stuff
+          if:
+            eq:
+              var: took_stuff
+              value: false
+          effects:
+            - set:
+                var: took_stuff
+                value: true
+            - add_item:
+                id: gas_mask
+            - add_item:
+                id: taskbook
+          goto:
+            scene: prologue_awake
+            node: awake
+          
+        - id: head_out
+          text: prologue.choice.head_out
+          if:
+            all:
+              - eq:
+                  var: took_stuff
+                  value: true
+              - eq:
+                  var: looked_around
+                  value: true
+          goto:
+            scene: prologue_awake
+            node: corridor
+
+    ###################################
+    ### PROLOGUE SCENE 2 | CORRIDOR ###
+    ###################################
+
+    - id: corridor
+
+      text:
+        - key: prologue.corridor.intro
+        - key: prologue.corridor.see_signs
+
+        - if:
+            eq:
+              var: has_read_signs
+              value: true
+          then:
+            key: prologue.corridor.read_signs
+        - if:
+            eq:
+              var: has_read_signs
+              value: true
+          then:
+            key: prologue.corridor.sign_1
+        - if:
+            eq:
+              var: has_read_signs
+              value: true
+          then:
+            key: prologue.corridor.sign_2
+        - if:
+            eq:
+              var: has_read_signs
+              value: true
+          then:
+            key: prologue.corridor.sign_3
+
+      choices:
+        - id: corridor_read_signs
+          text: prologue.choice.read_signs
+          if:
+            eq:
+              var: has_read_signs
+              value: false
+          effects:
+            - set:
+                var: has_read_signs
+                value: true
+          goto:
+            scene: prologue_awake
+            node: corridor
+        - id: corridor_head_left
+          text: prologue.choice.head_left
+          if:
+            all:
+              - eq:
+                  var: has_read_signs
+                  value: true
+              - eq:
+                  var: has_gone_to_armory
+                  value: false
+          effects:
+            - set:
+                var: has_gone_to_armory
+                value: true
+          goto:
+            scene: prologue_awake
+            node: munitions
+
+    ##############################################
+    ### PROLOGUE SCENE 2.1 | MUNITIONS STORAGE ###
+    ##############################################
+
+    - id: munitions
+      
+      text:
+        - key: prologue.munitions.intro
+
+        - if:
+            eq:
+              var: inspected_crates
+              value: true
+          then:
+            key: prologue.munitions.inspect_crates
+        - if:
+            eq:
+              var: inspected_crates_again
+              value: true
+          then:
+            key: prologue.munitions.inspect_crates_again
+        - if:
+            eq:
+              var: qm_dialogue_flag_1
+              value: true
+          then:
+            key: prologue.munitions.speak_to_quartermaster
+        - if:
+            eq:
+              var: qm_dialogue_flag_1
+              value: true
+          then:
+            key: prologue.munitions.quartermaster_dialogue_1
+        - if:
+            eq:
+              var: qm_dialogue_flag_2a
+              value: true
+          then:
+            key: prologue.munitions.quartermaster_dialogue_2a
+        - if:
+            eq:
+              var: qm_dialogue_flag_2b
+              value: true
+          then:
+            key: prologue.munitions.quartermaster_dialogue_2b
+        - if:
+            all:
+              - eq:
+                  var: qm_dialogue_flag_3
+                  value: true
+              - eq:
+                  var: qm_dialogue_flag_2a
+                  value: true
+          then:
+            key: prologue.munitions.goodbye_qm_a
+        - if:
+            all:
+              - eq:
+                  var: qm_dialogue_flag_3
+                  value: true
+              - eq:
+                  var: qm_dialogue_flag_2b
+                  value: true
+          then:
+            key: prologue.munitions.goodbye_qm_b
+
+      choices:
+        - id: inspect_crates
+          text: prologue.choice.inspect_crates
+          if:
+            eq:
+              var: inspected_crates
+              value: false
+          effects:
+            - set:
+                var: inspected_crates
+                value: true
+          goto:
+            scene: prologue_awake
+            node: munitions
+
+        - id: inspect_crates_again
+          text: prologue.choice.inspect_crates
+          if:
+            all:
+              - eq:
+                  var: inspected_crates
+                  value: true
+              - eq:
+                  var: inspected_crates_again
+                  value: false
+          effects:
+            - set:
+                var: inspected_crates_again
+                value: true
+          goto:
+            scene: prologue_awake
+            node: munitions
+
+        - id: approach_armory
+          text: prologue.choice.approach_armory
+          if:
+            eq:
+              var: qm_dialogue_flag_1
+              value: false
+          effects:
+            - set:
+                var: qm_dialogue_flag_1
+                value: true
+          goto:
+            scene: prologue_awake
+            node: munitions
+
+        - id: talk_to_qm_1a
+          text: prologue.choice.talk_to_qm_1a
+          if:
+            all:
+              - eq:
+                  var: qm_dialogue_flag_1
+                  value: true
+              - eq:
+                  var: qm_dialogue_flag_2a
+                  value: false
+              - eq:
+                  var: qm_dialogue_flag_2b
+                  value: false
+          effects:
+            - set:
+                var: qm_dialogue_flag_2a
+                value: true
+          goto:
+            scene: prologue_awake
+            node: munitions
+        - id: talk_to_qm_1b
+          text: prologue.choice.talk_to_qm_1b
+          if:
+            all:
+              - eq:
+                  var: qm_dialogue_flag_1
+                  value: true
+              - eq:
+                  var: qm_dialogue_flag_2a
+                  value: false
+              - eq:
+                  var: qm_dialogue_flag_2b
+                  value: false
+          effects:
+            - set:
+                var: qm_dialogue_flag_2b
+                value: true
+          goto:
+            scene: prologue_awake
+            node: munitions
+
+        - id: talk_to_qm_2a
+          text: prologue.choice.talk_to_qm_2
+          if:
+            all:
+              - eq:
+                  var: qm_dialogue_flag_2a
+                  value: true
+              - eq:
+                  var: qm_dialogue_flag_3
+                  value: false
+          effects:
+            - set:
+                var: qm_dialogue_flag_3
+                value: true
+          goto:
+            scene: prologue_awake
+            node: munitions
+        - id: talk_to_qm_2b
+          text: prologue.choice.talk_to_qm_2
+          if:
+            all:
+              - eq:
+                  var: qm_dialogue_flag_2b
+                  value: true
+              - eq:
+                  var: qm_dialogue_flag_3
+                  value: false
+          effects:
+            - set:
+                var: qm_dialogue_flag_3
+                value: true
+            - add_item:
+                id: service_rifle
+            - add_item:
+                id: service_rifle_ammunition
+            - add_item:
+                id: service_bayonet
+          goto:
+            scene: prologue_awake
+            node: munitions
+
+        - id: return_to_corridor
+          text: prologue.choice.return_to_corridor
+          if:
+            eq:
+              var: qm_dialogue_flag_3
+              value: true
+          goto:
+            scene: prologue_awake
+            node: corridor
+        
+

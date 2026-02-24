@@ -1,0 +1,23 @@
+items:
+
+  ### PROLOGUE SCENE 1 | AWAKE - BEDROOM ###
+  gas_mask:
+    name: prologue.item.gas_mask.name
+    description: prologue.item.gas_mask.description
+
+  taskbook:
+    name: prologue.item.taskbook.name
+    description: prologue.item.taskbook.description
+  
+  ### PROLOGUE SCENE 2.1 | MUNITIONS STORAGE ###
+  service_rifle:
+    name: prologue.item.service_rifle.name
+    description: prologue.item.service_rifle.description
+
+  service_rifle_ammunition:
+    name: prologue.item.service_rifle_ammunition.name
+    description: prologue.item.service_rifle_ammunition.description
+
+  service_bayonet:
+    name: prologue.item.service_bayonet.name
+    description: prologue.item.service_bayonet.description

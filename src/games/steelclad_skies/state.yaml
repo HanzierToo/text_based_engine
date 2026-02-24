@@ -1,0 +1,77 @@
+state:
+  variables:
+
+    # Narrative progression flags
+
+    ### PROLOGUE SCENE 1 | AWAKE - BEDROOM ###
+    looked_around:
+      type: boolean
+      initial: false
+      visible: true
+
+    took_stuff:
+      type: boolean
+      initial: false
+      visible: true
+
+    ### PROLOGUE SCENE 2 | CORRIDOR ###
+    has_read_signs:
+      type: boolean
+      initial: false
+      visible: true
+
+    has_gone_to_armory:
+      type: boolean
+      initial: false
+      visible: true
+
+    qm_dialogue_flag_1:
+      type: boolean
+      initial: false
+      visible: true
+
+    qm_dialogue_flag_2a:
+      type: boolean
+      initial: false
+      visible: true
+
+    qm_dialogue_flag_2b:
+      type: boolean
+      initial: false
+      visible: true
+
+    qm_dialogue_flag_3:
+      type: boolean
+      initial: false
+      visible: true
+
+    ### PROLOGUE SCENE 2.1 | MUNITIONS STORAGE ###
+    inspected_crates:
+      type: boolean
+      initial: false
+      visible: true
+    
+    inspected_crates_again:
+      type: boolean
+      initial: false
+      visible: true
+
+    start_talk_qm:
+      type: boolean
+      initial: false
+      visible: true
+
+    end_talk_qm:
+      type: boolean
+      initial: false
+      visible: true
+
+    taken_weapon:
+      type: boolean
+      initial: false
+      visible: true
+
+    # operator_trust:
+    #   type: number
+    #   initial: 0
+    #   visible: true

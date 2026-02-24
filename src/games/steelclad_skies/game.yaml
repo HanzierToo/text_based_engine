@@ -1,0 +1,12 @@
+game:
+  id: steelclad_skies
+  title: Steelclad Skies
+  version: "0.1"
+
+  start:
+    scene: prologue_awake
+    node: awake
+
+  ui:
+    theme: default
+    text_speed: rapid

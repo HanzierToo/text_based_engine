@@ -1,0 +1,9 @@
+rules:
+  systems:
+    randomness: false
+    inventory: true
+    statistics: false
+    combat: false
+
+  state_visibility:
+    default: visible

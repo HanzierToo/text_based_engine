@@ -8,6 +8,10 @@
   font-family: monospace;
   line-height: 1.6;
   transition: background 0.2s ease, color 0.2s ease;
+  .content p,
+    .content span {
+    white-space: pre-line;
+    }
 }
 
 /* ================================

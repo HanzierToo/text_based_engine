@@ -1,0 +1,188 @@
+prologue:
+
+  ### PROLOGUE SCENE 1 | AWAKE - BEDROOM ###
+  awake:
+    intro: >
+      The hums of the giant engines roar across the cabin room. Somethings afoot.
+      The humming is different today–quieter and less distinct.
+      You awake and check your notice-board for updates.
+
+    notice_board: >
+      General Notice — Between 0100 and 1300 the following events will occur today:
+      Engine #5 maintenance —
+      Junction Station #3 maintenance —
+      Propellers #15 – #20 maintenance —
+      Remain Vigilant. Remain Ready. The Ministry Appreciates You.
+
+    make_ready: >
+      That explains the difference of sound. You get ready for the day,
+      cleaning yourself with wet cloths and your precious allocation of clean water.
+      You use it sparingly, it's all you'll have for the week.
+      If you do well enough today you might be able to afford soap at
+      the provisions exchange today. You hang the cloths to dry and put on your
+      work clothes for the day
+
+    look_around: >
+      It's your room, though claiming it's yours isn't quite right.
+      Rusted steel walls and flooring provide that industrial smell
+      you're so familiar with.
+      The only objects of interest are your standard-issue gas mask and taskbook.
+      There are no windows–you had your access to them revoked last month due to poor behaviour.
+      The hanging cloths from today and yesterday stink up the room,
+      though the exhaust vent helps a bit.
+
+    take_stuff: >
+      You take your gas mask–hopefully today you won't need it.
+      You take your taskbook.
+
+  ### PROLOGUE SCENE 2 | CORRIDOR ###
+  corridor:
+    intro: >
+      You crank the wheel on your large water-tight steel door.
+      It's strange how an airship like this would be designed to use these bulky,
+      water-tight doors. You never bothered to question it though, you never had the time.
+      The door creaks open slowly as you pull it inwards to reveal the dimly-lit corridor.
+      Opposite to you is the room of another of your cabin mates, and the corridor is
+      littered with doors similar to your own.
+
+    see_signs: >
+      Slightly to your right, hanging from the ceiling, is a series of crude and barely
+      legible signs. The text on them you're all too familiar with.
+
+    read_signs: >
+      The signs read:
+    
+    sign_1: >
+      ◀ MUNITIONS STORAGE BULKHEAD ◀
+
+    sign_2: >
+      ▲ OFFICERS QUARTERS | EXIT ▲
+
+    sign_3: >
+      ▶ CANTEEN | MEDICAL BAY ▶
+
+    munition_prompt: >
+      Looking at your taskbook, you can see that you're still missing your service
+      rifle and alotted ammunition for the day. You should head to the armory in the
+      bulkead munitions storage and see the quartermaster for your weapon.
+
+    first_aid_prompt: >
+      Now that you have your weapon, the last equipment you'll need today is your personal
+      first-aid kit. The one you have on you is several years old and is likely useless
+      or expired, particularly the chemicals. It'd be wise to go see the field medics about
+      renewing or replacing your kit. However, there's no harm in arriving to work early.
+      You haven't had to use your weapon or first-aid kit since you enlisted.
+  
+  ### PROLOGUE SCENE 2.1 | MUNITIONS STORAGE ###
+  munitions:
+    intro: >
+      You walk into the dimly lit bulkhead storage room. In front of your are
+      countless numbers of crates and racks containing munitions for the weapons
+      of the ships. To your left you see a small sectioned-off room which bears a
+      crudely written and maintained sign labelled "Crewman Armory". Boxes are strewn
+      about haphazardly and with little thought in organization.
+
+    inspect_crates: >
+      The big wooden crates are stamped with the seal of the ministry, along with some
+      text underneath indicating what they contain. The large, wide and narrow boxes
+      contain cannon shells, and the more box-shaped crates seem to contain small arms
+      ammunition and other paraphernalia. Nothing you wouldn't expect outside of munitions
+      storage, bar the sole exception of a row of black crates not labelled and locked with
+      padlocks and guarded by two unamused looking guards. At least, you think they're
+      unamused. You can't tell since their steel masks and black-and-gold uniforms hide
+      any semblance of humanity.
+
+    inspect_crates_again: >
+      You get a closer look at the crates and see some labels that catch your attention.
+      "Shot, A.P.D.S., 17-pr., Mk II", "Shell, H.E., 6-pr., Mk IV, Fuze 130".
+      You have no idea what any of those mean. And even if you did, it wouldn't matter
+      since you're not part of the artillery corps. Before you could find any more riveting
+      crates to inspect, the quartermaster warns you not to go any further in case the
+      ministry's sentries catch wind of you beyond your allowed access.
+
+    speak_to_quartermaster: >
+      You head over to the armory and speak to the quartermaster.
+
+    quartermaster_dialogue_1: >
+      "There you are. Your rifle's in its usual place, third rack, fourth from the bottom.
+      Here's your ammo. I wouldn't go hunting if I were you *chuckle*. Oh and your bayonet's
+      already attached to the rifle. I know how much you love taking that thing off."
+
+    quartermaster_dialogue_2a: >
+      "No worries mate. I made sure to polish that barrel band you was whinging about yesterday.
+      Let me know if you see anything else that needs fixing, though maintaining it is really
+      your responsibility."
+
+    quartermaster_dialogue_2b: >
+      "Late? Mate you are the only bastard here dumb enough to wake up early. If it weren't
+      for you I'd still be asleep. Kidding of course, the Lieutenant would kill me."
+    
+    goodbye_qm_a: >
+      You wave goodbye to J."
+
+    goodbye_qm_b: >
+      You wave goodbye to J, followed by a cursory exchange of insults, slowly morphing your
+      wave into a middle finger. "Wanker."
+
+  ### PROLOGUE SCENE 2.2 | CANTEEN / MEDICAL BAY ###
+
+  canteen:
+    intro: >
+      
+
+  medical_bay:
+  
+
+  choice:
+
+    ### PROLOGUE SCENE 1 | AWAKE - BEDROOM ###
+    look_around: "Look around"
+    take_stuff: "Take your stuff"
+
+    ### PROLOGUE SCENE 2 | CORRIDOR ###
+    head_out: "Head out"
+    read_signs: "Read the signs"
+    head_left: "Head left"
+    head_right: "Head right"
+    head_forwards: "Head forwards"
+
+    ### PROLOGUE SCENE 2.1 | MUNITIONS STORAGE ###
+    inspect_crates: "Inspect the crates"
+    approach_armory: "Approach the armory"
+    talk_to_qm_1a: "\"Got it, cheers J.\""
+    talk_to_qm_1b: "\"Sorry, am I late?\""
+    talk_to_qm_2: "\"Thanks again J, I'll see you at mess later.\""
+    return_to_corridor: "Return to corridor"
+
+  item:
+
+    ### PROLOGUE SCENE 1 | AWAKE - BEDROOM ###
+    gas_mask:
+      name: "Gas Mask"
+      description: "Standard issue from the ministry. It reeks of sulfur and sweat."
+
+    taskbook:
+      name: "Taskbook"
+      description: "Notes and tasks scribbled from previous assignments on days past litter the book's pages."
+
+    ### PROLOGUE SCENE 2.1 | MUNITIONS STORAGE ###
+    service_rifle:
+      name: "Service Rifle"
+      description: >
+        Your trusty .303 service rifle. God knows when or where it came from. The wood's been
+        polished to a shine, but you can see the visible markings of age and rot beneath the
+        surface finish.
+
+    service_rifle_ammunition:
+      name: "Service Rifle Ammunition"
+      description: >
+        Loose rounds in a sheath of wax-paper. The brass is worn and has seen better days.
+        You've only got so many rounds. It's been decades since the last war, or so the ministry
+        says. These won't win you a war, or even a battle, but it's better than nothing.
+
+    service_bayonet:
+      name: "Service Bayonet"
+      description: >
+        In surprisingly good condition, considering the age of everything else. The blade is
+        sharp, well-kept, and shows no sign of age or wear-and-tear, only the slight
+        discoloration of the leather-strip handle would clue you in to the age of the thing.
