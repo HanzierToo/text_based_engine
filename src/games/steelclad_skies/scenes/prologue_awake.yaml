@@ -107,6 +107,12 @@ scene:
               value: true
           then:
             key: prologue.corridor.sign_3
+        - if:
+            eq:
+              var: tried_left_again
+              value: true
+          then:
+            key: prologue.corridor.tried_left_again
 
       choices:
         - id: corridor_read_signs
@@ -139,6 +145,23 @@ scene:
           goto:
             scene: prologue_awake
             node: munitions
+        - id: corridor_head_left_again
+          text: prologue.choice.head_left
+          if:
+            all:
+              - eq:
+                  var: has_read_signs
+                  value: true
+              - eq:
+                  var: has_gone_to_armory
+                  value: true
+          effects:
+            - set:
+                var: tried_left_again
+                value: true
+          goto:
+            scene: prologue_awake
+            node: corridor
 
     ##############################################
     ### PROLOGUE SCENE 2.1 | MUNITIONS STORAGE ###
@@ -308,6 +331,12 @@ scene:
             - set:
                 var: qm_dialogue_flag_3
                 value: true
+            - add_item:
+                id: service_rifle
+            - add_item:
+                id: service_rifle_ammunition
+            - add_item:
+                id: service_bayonet
           goto:
             scene: prologue_awake
             node: munitions

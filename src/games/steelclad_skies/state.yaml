@@ -25,6 +25,22 @@ state:
       initial: false
       visible: true
 
+    tried_left_again:
+      type: boolean
+      initial: false
+      visible: true
+
+    ### PROLOGUE SCENE 2.1 | MUNITIONS STORAGE ###
+    inspected_crates:
+      type: boolean
+      initial: false
+      visible: true
+    
+    inspected_crates_again:
+      type: boolean
+      initial: false
+      visible: true
+
     qm_dialogue_flag_1:
       type: boolean
       initial: false
@@ -45,31 +61,10 @@ state:
       initial: false
       visible: true
 
-    ### PROLOGUE SCENE 2.1 | MUNITIONS STORAGE ###
-    inspected_crates:
-      type: boolean
-      initial: false
-      visible: true
-    
-    inspected_crates_again:
-      type: boolean
-      initial: false
-      visible: true
-
-    start_talk_qm:
-      type: boolean
-      initial: false
-      visible: true
-
-    end_talk_qm:
-      type: boolean
-      initial: false
-      visible: true
-
-    taken_weapon:
-      type: boolean
-      initial: false
-      visible: true
+    # taken_weapon:
+    #   type: boolean
+    #   initial: false
+    #   visible: true
 
     # operator_trust:
     #   type: number

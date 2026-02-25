@@ -72,6 +72,10 @@ prologue:
       or expired, particularly the chemicals. It'd be wise to go see the field medics about
       renewing or replacing your kit. However, there's no harm in arriving to work early.
       You haven't had to use your weapon or first-aid kit since you enlisted.
+
+    tried_left_again: >
+      There's not much of interest in the munitions storage anymore. Better to move along
+      than be late. You wouldn't want to upset the officers.
   
   ### PROLOGUE SCENE 2.1 | MUNITIONS STORAGE ###
   munitions:
