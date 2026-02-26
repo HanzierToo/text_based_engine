@@ -4,12 +4,12 @@
 
   export let visible: boolean = false
 
-  function jumpTo(scene: string, node: string) {
+  function reloadWithSave(mutator: (save: any) => void) {
     const state = get(engineStore)
     if (!state.engine) return
 
     const save = state.engine.save()
-    save.at = { scene, node }
+    mutator(save)
 
     const vm = state.engine.load(save)
 
@@ -18,12 +18,52 @@
       viewModel: vm,
     })
   }
+
+  function jumpTo(scene: string, node: string) {
+    reloadWithSave(save => {
+      save.at = { scene, node }
+    })
+  }
+
+  function setState(key: string, value: any) {
+    reloadWithSave(save => {
+      save.state[key] = value
+    })
+  }
+
+  function addItem(itemId: string) {
+    reloadWithSave(save => {
+      if (!save.inventory.includes(itemId)) {
+        save.inventory.push(itemId)
+      }
+    })
+  }
+
+  function removeItem(itemId: string) {
+    reloadWithSave(save => {
+      save.inventory = save.inventory.filter((i: string) => i !== itemId)
+    })
+  }
+
+  function handleStateInputChange(
+    e: Event,
+    key: string
+  ) {
+    const input = e.currentTarget as HTMLInputElement
+    const raw = input.value
+
+    setState(
+      key,
+      isNaN(+raw) ? raw : +raw
+    )
+  }
 </script>
 
 {#if visible && $engineStore.engine}
   <div class="debug">
     <h3>DEBUG PANEL</h3>
 
+    <!-- CURRENT NODE -->
     <section>
       <strong>Current Node:</strong>
       <div>
@@ -32,18 +72,53 @@
       </div>
     </section>
 
+    <!-- STATE EDITOR -->
     <section>
-      <strong>State:</strong>
-      <pre>
-{JSON.stringify($engineStore.engine.getFullState(), null, 2)}
-      </pre>
+      <strong>State Editor:</strong>
+      {#each Object.entries($engineStore.engine.getFullState()) as [key, value]}
+        <div class="row">
+          <span>{key}</span>
+
+          {#if typeof value === 'boolean'}
+            <button on:click={() => setState(key, !value)}>
+              {String(value)}
+            </button>
+          {:else}
+            <input
+              type="text"
+              value={value}
+              on:change={(e) => handleStateInputChange(e, key)}
+            />
+          {/if}
+        </div>
+      {/each}
     </section>
 
+    <!-- INVENTORY EDITOR -->
     <section>
-      <strong>Inventory:</strong>
-      <pre>{JSON.stringify($engineStore.engine.getInventory(), null, 2)}</pre>
+      <strong>Inventory Editor:</strong>
+
+      <div>
+        <em>Current:</em>
+        {#each $engineStore.engine.getInventory() as item}
+          <div class="row">
+            {item.id}
+            <button on:click={() => removeItem(item.id)}>Remove</button>
+          </div>
+        {/each}
+      </div>
+
+      <div>
+        <em>Add Item:</em>
+        {#each $engineStore.engine.getAllItemIds() as itemId}
+          <button on:click={() => addItem(itemId)}>
+            + {itemId}
+          </button>
+        {/each}
+      </div>
     </section>
 
+    <!-- HISTORY -->
     <section>
       <strong>History:</strong>
       <pre>
@@ -51,6 +126,7 @@
       </pre>
     </section>
 
+    <!-- SCENE JUMP -->
     <section>
       <strong>Jump To:</strong>
       {#each Array.from($engineStore.engine.getAllScenes().entries()) as [sceneId, scene]}
@@ -72,7 +148,7 @@
     position: fixed;
     right: 0;
     top: 0;
-    width: 320px;
+    width: 360px;
     height: 100vh;
     background: #111;
     color: #eee;
@@ -84,8 +160,20 @@
     z-index: 9999;
   }
 
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 4px 0;
+  }
+
+  .debug input {
+    width: 100px;
+    font-size: 11px;
+  }
+
   .debug button {
-    margin: 2px;
+    margin-left: 4px;
     font-size: 11px;
   }
 

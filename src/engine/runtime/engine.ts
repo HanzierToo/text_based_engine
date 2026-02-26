@@ -252,4 +252,8 @@ export class Engine {
         }
     })
   }
+
+  getAllItemIds(): string[] {
+    return Array.from(this.model.items.keys())
+  }
 }
